@@ -7,7 +7,10 @@ import os, time
 app = Flask(__name__)
 constants = Constants(os.environ)
 app.secret_key = constants.get('SK')
-#s3 = S3(constants.get('AWS_ACCESS_KEY'), constants.get('AWS_SECRET_KEY'), constants.get('AWS_BUCKET'))
+try:
+  s3 = S3(constants.get('AWS_ACCESS_KEY'), constants.get('AWS_SECRET_KEY'), constants.get('AWS_BUCKET'))
+except:
+  s3 = None
 
 @app.route('/')
 def index_view():
@@ -15,11 +18,15 @@ def index_view():
 
 @app.route('/redirect/<object_key>')
 def redirect_view(object_key):
-  if session.get('verified') == True:
-    url = s3.get_url(object_key, constants.get('EXPIRES'))
-    return redirect(url)
+  if s3:
+    if session.get('verified') == True:
+      url = s3.get_url(object_key, constants.get('EXPIRES'))
+      return redirect(url)
+    else:
+      redirect(url_for('login_view'))
   else:
-    redirect(url_for('login_view'))
+    flash('Your S3 keys are invalid!', 'danger')
+    redirect(url_for('demo_view'))
 
 @app.route('/login')
 def login_view():
@@ -36,11 +43,14 @@ def callback_view():
     code = request.args.get('code')
     user = GithubUser(code=code, client_id=constants.get('GH_CLIENT_ID'), secret=constants.get('GH_SECRET'))
     session['token'] = user.token
-    if user.verify(constants.get('GH_ORG')):
+    if user.verify_org(constants.get('GH_ORG')) and user.verify_repo(constants.get('GH_REPO')):
+      flash('You are now logged in!', 'success')
       session['verified'] = True
     else:
+      flash('You do not satisfy the authentication requirements!', 'danger')
       session['verified'] = False
   else:
+    flash('Your GitHub credentials are not valid!', 'danger')
     session['verified'] = False
   return redirect(url_for('demo_view'))
 
