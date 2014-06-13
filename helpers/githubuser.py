@@ -9,6 +9,8 @@ class GithubUser():
     self.orgs = self.user.get_orgs()
     self.repos = self.user.get_repos()
     self.teams = self.user.get_teams()
+  def is_valid(self):
+    return bool(self.token)
   def get_token(self, code, client_id, secret):
     data = {
     'client_id': client_id,
@@ -17,7 +19,7 @@ class GithubUser():
     }
     headers = {'Accept': 'application/json'}
     r = requests.post('https://github.com/login/oauth/access_token', data=data, headers=headers)
-    return r.json()['access_token']
+    return r.json().get('access_token')
   def verify_org(self, org):
     for o in self.orgs:
       if str(o.id) == org:

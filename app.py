@@ -1,4 +1,4 @@
-from flask import Flask, redirect, session, request, render_template, url_for
+from flask import Flask, redirect, session, request, render_template, url_for, flash
 from helpers.s3 import S3
 from helpers.constants import Constants
 from helpers.githubuser import GithubUser
@@ -26,7 +26,7 @@ def redirect_view(object_key):
       redirect(url_for('login_view'))
   else:
     flash('Your S3 keys are invalid!', 'danger')
-    redirect(url_for('demo_view'))
+    return redirect(url_for('demo_view'))
 
 @app.route('/login')
 def login_view():
@@ -42,16 +42,17 @@ def callback_view():
   if request.args.get('state') == session.get('state'):
     code = request.args.get('code')
     user = GithubUser(code=code, client_id=constants.get('GH_CLIENT_ID'), secret=constants.get('GH_SECRET'))
-    session['token'] = user.token
-    if user.verify_org(constants.get('GH_ORG')) and user.verify_repo(constants.get('GH_REPO')):
-      flash('You are now logged in!', 'success')
-      session['verified'] = True
+    if user.is_valid():
+      session['token'] = user.token
+      if user.verify_org(constants.get('GH_ORG')) and user.verify_repo(constants.get('GH_REPO')):
+        flash('You are now logged in!', 'success')
+        session['verified'] = True
+      else:
+        flash('You do not satisfy the authentication requirements!', 'danger')
+        session['verified'] = False
     else:
-      flash('You do not satisfy the authentication requirements!', 'danger')
+      flash('Your GitHub credentials are not valid!', 'danger')
       session['verified'] = False
-  else:
-    flash('Your GitHub credentials are not valid!', 'danger')
-    session['verified'] = False
   return redirect(url_for('demo_view'))
 
 @app.route('/demo')
