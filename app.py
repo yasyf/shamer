@@ -18,6 +18,7 @@ def index_view():
 
 @app.route('/redirect/<object_key>')
 def redirect_view(object_key):
+  session['object_key'] = object_key
   if s3:
     if session.get('verified') == True:
       url = s3.get_url(object_key, constants.get('EXPIRES'))
@@ -58,6 +59,8 @@ def callback_view():
 @app.route('/demo')
 def demo_view():
   if session.get('token'):
+    if session.get('object_key'):
+      flash("Redirecting to '{}' on S3...".format(session.pop('object_key')), 'warning')
     return render_template('demo_user.html',
       user=GithubUser(token=session.get('token')),
       v_org=constants.get('GH_ORG'),

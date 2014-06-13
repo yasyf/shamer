@@ -18,11 +18,27 @@
   </ul>
 </p>
 
+<p>
+  <h4>Test Redirect</h4>
+  S3 Object Key: 
+  <input type='text' id='object_key'>
+  <button type='button' id='object_key_btn' class='btn btn-default'>Go!</button>
+</p>
 
 {% if user.user.bio %}
 <p>
 {{ user.user.bio }}
 </p>
 {% endif %}
+
+<script>
+  $(document).ready(function() {
+    $('#object_key_btn').click(function() {
+      object_key = $('#object_key').val();
+      url = "{{ url_for('redirect_view', object_key='object_key') }}".replace('object_key',object_key);
+      window.location = url;
+    });
+  });
+</script>
 
 {% endblock %}
