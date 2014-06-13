@@ -1,7 +1,18 @@
 {% extends "_base.html" %}
-{% block title %}{% endblock %}
+{% block title %}Welcome, {{ user.user.name  }}{% endblock %}
 {% block body %}
 
-{{ user }}
+<img src="{{ user.user.avatar_url }}" width='100' height='100' />
+
+<p>
+	{{ user.user.name }} ({{ user.user.email }}) from 
+	{{ user.user.company if user.user.company else user.user.location }}
+</p>
+
+{% if user.user.bio %}
+<p>
+{{ user.user.bio }}
+</p>
+{% endif %}
 
 {% endblock %}

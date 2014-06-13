@@ -23,7 +23,7 @@ def redirect_view(object_key):
 
 @app.route('/login')
 def login_view():
-  session['state'] = hash(str(time.time())+constants.get('SK'))
+  session['state'] = str(hash(str(time.time())+constants.get('SK')))
   query = 'client_id={}&scope={}&state={}'.format(
     constants.get('GH_CLIENT_ID'),
     constants.get('GH_SCOPE'),
@@ -34,7 +34,7 @@ def login_view():
 def callback_view():
   if request.args.get('state') == session.get('state'):
     code = request.args.get('code')
-    user = GithubUser(code=code)
+    user = GithubUser(code=code, client_id=constants.get('GH_CLIENT_ID'), secret=constants.get('GH_SECRET'))
     session['token'] = user.token
     if user.verify(constants.get('GH_ORG')):
       session['verified'] = True

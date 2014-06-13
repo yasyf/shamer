@@ -2,15 +2,15 @@ from github import Github
 import requests
 
 class GithubUser():
-  def __init__(self, code=None, token=None):
-    self.token = token or self.get_token(code)
+  def __init__(self, code=None, token=None, client_id=None, secret=None):
+    self.token = token or self.get_token(code, client_id, secret)
     self.g = Github(self.token)
     self.user = self.g.get_user()
     self.orgs = self.user.get_orgs()
-  def get_token(self, code):
+  def get_token(self, code, client_id, secret):
     data = {
-    'client_id': constants.get('GH_CLIENT_ID'),
-    'client_secret': constants.get('GH_SECRET'),
+    'client_id': client_id,
+    'client_secret': secret,
     'code': code
     }
     headers = {'Accept': 'application/json'}
