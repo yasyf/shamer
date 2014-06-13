@@ -47,7 +47,10 @@ def callback_view():
 @app.route('/demo')
 def demo_view():
   if session.get('token'):
-    return render_template('demo_user.html', user=GithubUser(token=session.get('token')))
+    return render_template('demo_user.html',
+      user=GithubUser(token=session.get('token')),
+      v_org=constants.get('GH_ORG'),
+      v_repo=constants.get('GH_REPO'))
   else:    
     return render_template('demo.html')
 

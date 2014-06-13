@@ -1,13 +1,23 @@
 {% extends "_base.html" %}
-{% block title %}Welcome, {{ user.user.name  }}{% endblock %}
+{% block title %}Github S3 Auth Demo{% endblock %}
 {% block body %}
 
-<img src="{{ user.user.avatar_url }}" width='100' height='100' />
+<h1>Github S3 Auth Demo</h1>
 
 <p>
+  <img src="{{ user.user.avatar_url }}" width='30' height='30' />
 	{{ user.user.name }} ({{ user.user.email }}) from 
 	{{ user.user.company if user.user.company else user.user.location }}
 </p>
+<p>
+  <h4>Validations</h4>
+  <ul>
+    <li>User is part of org {{ v_org }}: <b> {{ user.verify_org(v_org) }} </b></li>
+    <li>User has push access to repo {{ v_repo }}: <b> {{ user.verify_repo(v_repo) }} </b></li>
+    <li>User will be redirected to S3: <b> {{ user.verify_org(v_org) and user.verify_repo(v_repo) }} </b></li>
+  </ul>
+</p>
+
 
 {% if user.user.bio %}
 <p>
