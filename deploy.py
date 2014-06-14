@@ -62,7 +62,7 @@ def get_params():
 	return {param:_locals[param] for param in params}
 
 def deploy(params):
-	print colored('Creating Heroku App', 'green')
+	print colored('Creating Heroku App', 'magenta')
 	try:
 		if params['APP_NAME']:
 			output = subprocess.check_output(['heroku', 'create', params['APP_NAME']])
@@ -73,14 +73,14 @@ def deploy(params):
 		sys.exit(colored('heroku app creation failed!', 'red'))
 	config = map(lambda x: "{}={}".format(x[0], x[1]), params.items())
 
-	print colored('Writing Heroku Config Vars To .env', 'green')
+	print colored('Writing Heroku Config Vars To .env', 'magenta')
 	with open('.env', 'w') as f:
 		f.write("\n".join(config))
 
-	print colored('Setting Heroku Config Vars', 'green')
+	print colored('Setting Heroku Config Vars', 'magenta')
 	call_without_output(['heroku', 'config:set'] + config + ['--app', params['APP_NAME']])
 
-	print colored('Deploying to Heroku', 'green')
+	print colored('Deploying to Heroku', 'magenta')
 	git_remote = 'git@heroku.com:{}.git'.format(params['APP_NAME'])
 	call_without_output(['git', 'remote', 'add', params['APP_NAME'], git_remote])
 	call_without_output(['git', 'push', params['APP_NAME'], 'master'])
@@ -97,7 +97,7 @@ def deploy(params):
 	print message
 	prompt_with_condition('done? [y/n]', lambda x: x.lower() == 'y', message)
 
-	print colored('Launching App!', 'green')
+	print colored('Launching App!', 'magenta')
 	call_without_output(['heroku', 'ps:scale', 'web=1'])
 	call_without_output(['heroku', 'apps:open', '--app', params['APP_NAME']])
 
