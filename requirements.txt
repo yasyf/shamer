@@ -7,4 +7,5 @@ boto==2.29.1
 gunicorn==19.0.0
 itsdangerous==0.24
 requests==2.3.0
+termcolor==1.1.0
 wsgiref==0.1.2

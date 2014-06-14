@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 
 import subprocess, os, sys, uuid, re
-DEVNULL = open(os.devnull, 'w')
+from termcolor import colored
 
 def call_without_output(cmd):
 	return subprocess.call(cmd, stdout=DEVNULL, stderr=DEVNULL)
 
 def prompt(instructions):
-	return raw_input(instructions + ": ")
+	return raw_input(colored(instructions + ": ", 'blue', attrs=['bold']))
 
 def clear():
 	subprocess.call('cls' if os.name == 'nt' else 'clear')
 
 def check_for_heroku():
 	if call_without_output(['which', 'heroku']) == 1:
-		sys.exit('Please install and set up the heroku toolbelt before running this script!')
-	print 'Checking your heroku credentials...'
+		sys.exit(colored('Please install and set up the heroku toolbelt before running this script!', 'red'))
+	print colored('Checking your heroku credentials...', 'magenta')
 	subprocess.call(['heroku', 'auth:whoami'])
 	print
-	print 'Welcome to the github-s3-auth deployer script!'
-	print 'Please enter the following config vars.'
+	print colored('Welcome to the github-s3-auth deployer script!', 'green')
+	print colored('Please enter the following config vars.', 'green')
 	print
 
 def prompt_with_condition(message, condition, error):
@@ -27,7 +27,7 @@ def prompt_with_condition(message, condition, error):
 	while not done:
 		inp = prompt(message)
 		if not condition(inp):
-			print error
+			print colored(error, 'red')
 		else:
 			done = True
 	return inp
@@ -46,11 +46,11 @@ def get_params():
 	GH_ORG_NAME = prompt_need_response('github org name')
 	GH_REPO_NAME = prompt_need_response('github repo name')
 
-	print 'Get your org and repo ids from the GitHub API'
+	print colored('Get your org and repo ids from the GitHub API', 'green')
 	GH_ORG = prompt_with_condition('github org id', lambda x: x.isdigit() ,'org id must be an int')
 	GH_REPO = prompt_with_condition('github repo id', lambda x: x.isdigit() ,'repo id must be an int')
 
-	print 'Create a new GitHub App at https://github.com/organizations/{}/settings/applications'.format(GH_ORG_NAME)
+	print colored('Create a new GitHub App at ', 'green') + colored('https://github.com/organizations/{}/settings/applications'.format(GH_ORG_NAME), 'cyan')
 	GH_CLIENT_ID = prompt_with_condition('github client id', lambda x: len(x) == 20, 'client id must be 20 characters long')
 	GH_SECRET = prompt_with_condition('github client secret', lambda x: len(x) == 40, 'client secret must be 40 characters long')
 	
@@ -59,7 +59,7 @@ def get_params():
 	return {param:_locals[param] for param in params}
 
 def deploy(params):
-	print 'Creating Heroku App'
+	print colored('Creating Heroku App', 'green')
 	try:
 		if params['APP_NAME']:
 			output = subprocess.check_output(['heroku', 'create', params['APP_NAME']])
@@ -67,40 +67,46 @@ def deploy(params):
 			output = subprocess.check_output(['heroku', 'create'])
 		params['APP_NAME'] = re.match(r'Creating (.*)\.\.\.', output).group(1)
 	except subprocess.CalledProcessError:
-		sys.exit('heroku app creation failed!')
+		sys.exit(colored('heroku app creation failed!', 'red'))
 	config = map(lambda x: "{}={}".format(x[0], x[1]), params.items())
 
-	print 'Writing Heroku Config Vars To .env'
+	print colored('Writing Heroku Config Vars To .env', 'green')
 	with open('.env', 'w') as f:
 		f.write("\n".join(config))
 
-	print 'Setting Heroku Config Vars'
+	print colored('Setting Heroku Config Vars', 'green')
 	call_without_output(['heroku', 'config:set'] + config + ['--app', params['APP_NAME']])
 
-	print 'Deploying to Heroku'
+	print colored('Deploying to Heroku', 'green')
 	git_remote = 'git@heroku.com:{}.git'.format(params['APP_NAME'])
 	call_without_output(['git', 'remote', 'add', params['APP_NAME'], git_remote])
 	call_without_output(['git', 'push', params['APP_NAME'], 'master'])
 
-	message = "Set your GitHub App's Homepage URL to http://{}.herokuapp.com".format(params['APP_NAME'])
+	message = colored("Set your GitHub App's Homepage URL to ", 'green') \
+	+ colored("http://{}.herokuapp.com".format(params['APP_NAME']), 'cyan')
+
 	print message
 	prompt_with_condition('done? [y/n]', lambda x: x.lower() == 'y', message)
 
-	message = "Set your GitHub App's Authorization Callback URL to http://{}.herokuapp.com/callback".format(params['APP_NAME'])
+	message = "Set your GitHub App's Authorization Callback URL to ", 'green') \
+	+ colored("http://{}.herokuapp.com/callback".format(params['APP_NAME']), 'cyan')
+	
 	print message
 	prompt_with_condition('done? [y/n]', lambda x: x.lower() == 'y', message)
 
-	print 'Launching App!'
+	print colored('Launching App!', 'green')
 	call_without_output(['heroku', 'ps:scale', 'web=1'])
 	call_without_output(['heroku', 'apps:open', '--app', params['APP_NAME']])
 
-	print 'App URL: http://{}.herokuapp.com'.format(params['APP_NAME'])
+	print colored('App URL: ', 'green') \
+	+ colored('http://{}.herokuapp.com'.format(params['APP_NAME']), 'cyan')
 
 if __name__ == '__main__':
+	DEVNULL = open(os.devnull, 'w')
 	try:
 		clear()
 		check_for_heroku()
 		params = get_params()
 		deploy(params)
 	except KeyboardInterrupt:
-		sys.exit('\nDeploy cancelled')
+		sys.exit(colored('\nDeploy cancelled', 'red'))
