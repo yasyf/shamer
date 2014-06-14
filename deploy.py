@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 import subprocess, os, sys, uuid, re
-from termcolor import colored
+try:
+	from termcolor import colored
+except ImportError:
+	def colored(msg, color, **kwargs):
+		return msg
 
 def call_without_output(cmd):
 	return subprocess.call(cmd, stdout=DEVNULL, stderr=DEVNULL)
