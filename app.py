@@ -63,8 +63,8 @@ def demo_view():
       flash("Redirecting to '{}' on S3...".format(session.pop('object_key')), 'warning')
     return render_template('demo_user.html',
       user=GithubUser(token=session.get('token')),
-      v_org=constants.get('GH_ORG'),
-      v_repo=constants.get('GH_REPO'))
+      v_org=(constants.get('GH_ORG_NAME'), constants.get('GH_ORG')),
+      v_repo=(constants.get('GH_REPO_NAME'), constants.get('GH_REPO')))
   else:    
     return render_template('demo.html')
 

@@ -12,9 +12,9 @@
 <p>
   <h4>Validations</h4>
   <ul>
-    <li>User is part of org {{ v_org }}: <b> {{ user.verify_org(v_org) }} </b></li>
-    <li>User has push access to repo {{ v_repo }}: <b> {{ user.verify_repo(v_repo) }} </b></li>
-    <li>User will be redirected to S3: <b> {{ user.verify_org(v_org) and user.verify_repo(v_repo) }} </b></li>
+    <li>User is part of org {{ v_org[0] }}: <b> {{ user.verify_org(v_org[1]) }} </b></li>
+    <li>User has push access to repo {{ v_repo[0] }}: <b> {{ user.verify_repo(v_repo[1]) }} </b></li>
+    <li>User will be redirected to S3: <b> {{ user.verify_org(v_org[1]) and user.verify_repo(v_repo[1]) }} </b></li>
   </ul>
 </p>
 
