@@ -35,13 +35,16 @@ def prompt_with_condition(message, condition, error):
 def prompt_need_response(var):
 	return prompt_with_condition(var, lambda x: len(x) > 0, 'you must enter a {}'.format(var))
 
+def prompt_with_length(var, length):
+	return prompt_with_condition(var, lambda x: len(x) == length, '{} must be {} characters long'.format(var, length))
+
 def get_params():
 	APP_NAME = prompt('heroku app name (blank for random)') or ''
 	SK = prompt('flask app secret key (blank for random)') or str(uuid.uuid4())
 
 	AWS_BUCKET = prompt_need_response('s3 bucket')
-	AWS_ACCESS_KEY = prompt_need_response('aws access key')
-	AWS_SECRET_KEY = prompt_need_response('aws secret key')
+	AWS_ACCESS_KEY = prompt_with_length('aws access key', 20)
+	AWS_SECRET_KEY = prompt_with_length('aws secret key', 40)
 
 	GH_ORG_NAME = prompt_need_response('github org name')
 	GH_REPO_NAME = prompt_need_response('github repo name')
@@ -51,8 +54,8 @@ def get_params():
 	GH_REPO = prompt_with_condition('github repo id', lambda x: x.isdigit() ,'repo id must be an int')
 
 	print colored('Create a new GitHub App at ', 'green') + colored('https://github.com/organizations/{}/settings/applications'.format(GH_ORG_NAME), 'cyan')
-	GH_CLIENT_ID = prompt_with_condition('github client id', lambda x: len(x) == 20, 'client id must be 20 characters long')
-	GH_SECRET = prompt_with_condition('github client secret', lambda x: len(x) == 40, 'client secret must be 40 characters long')
+	GH_CLIENT_ID = prompt_with_length('github client id', 20)
+	GH_SECRET = prompt_with_length('github client secret', 40)
 	
 	_locals = locals()
 	params = ['APP_NAME', 'SK', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY','GH_ORG', 'GH_REPO', 'GH_ORG_NAME', 'GH_REPO_NAME', 'GH_CLIENT_ID', 'GH_SECRET']
@@ -88,7 +91,7 @@ def deploy(params):
 	print message
 	prompt_with_condition('done? [y/n]', lambda x: x.lower() == 'y', message)
 
-	message = "Set your GitHub App's Authorization Callback URL to ", 'green') \
+	message = colored("Set your GitHub App's Authorization Callback URL to ", 'green') \
 	+ colored("http://{}.herokuapp.com/callback".format(params['APP_NAME']), 'cyan')
 	
 	print message
