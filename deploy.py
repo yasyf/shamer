@@ -10,7 +10,7 @@ except ImportError:
 try:
   import requests
 except ImportError:
-  sys.exit('`sudo pip install requests` is required to continue!')
+  exit_with_error('`sudo pip install requests` is required to continue!')
 
 def open_or_print(url):
   print colored(url, 'cyan')
@@ -48,7 +48,7 @@ def check_for_heroku():
   print colored('Checking your Heroku credentials...', 'magenta')
   subprocess.call(['heroku', 'auth:whoami'])
   print
-  print colored('Welcome to the github-s3-auth deployer script!', 'green')
+  print_instruction('Welcome to the github-s3-auth deployer script!')
 
 def prompt_with_condition(message, condition, error):
   done = False
@@ -61,13 +61,19 @@ def prompt_with_condition(message, condition, error):
   return inp
 
 def prompt_need_response(var):
-  return prompt_with_condition(var, lambda x: len(x) > 0, 'you must enter a {}'.format(var))
+  return prompt_with_condition(var, lambda x: len(x) > 0, 'You must enter a {}'.format(var))
 
 def prompt_with_length(var, length):
   return prompt_with_condition(var, lambda x: len(x) == length, '{} must be {} characters long'.format(var, length))
 
 def prompt_get_yes_no(prompt):
   return prompt_need_response('{}? [y/n]'.format(prompt)).lower() == 'y'
+
+def print_instruction(instruction):
+  print colored(instruction, 'green')
+
+def exit_with_error(error):
+  sys.exit(colored(error, 'red'))
 
 def get_gh_auth():
   GH_USER = prompt_need_response('Your GitHub Username')
@@ -84,7 +90,7 @@ def get_params():
     if prompt_get_yes_no('Use current environment variables'):
       return env_params
 
-  print colored('Please enter the following config vars.', 'green')
+  print_instruction('Please enter the following config vars.')
   print
   APP_NAME = prompt('Heroku App Name (blank for random)') or ''
   SK = prompt('Flask App Secret Key (blank for random)') or str(uuid.uuid4())
@@ -102,7 +108,7 @@ def get_params():
     print colored('Found an org with id of {}!'.format(GH_ORG), 'grey')
   except:
     print colored('Could not automatically find that GitHub Organization!', 'red')
-    print colored('Use the GitHub API to get your org id', 'green')
+    print_instruction('Use the GitHub API to get your org id')
     open_or_print('https://developer.github.com/v3')
     GH_ORG = prompt_with_condition('GitHub Org Id', lambda x: x.isdigit() ,'org id must be an int')
  
@@ -114,16 +120,15 @@ def get_params():
         GH_REPO = repo['id']
     print colored('Found an repo with id of {}!'.format(GH_REPO), 'grey')
   except:
-    raise
     print colored('Could not automatically find that GitHub Repo!', 'red')
-    print colored('Use the GitHub API to get your org id', 'green')
+    print_instruction('Use the GitHub API to get your org id')
     open_or_print('https://developer.github.com/v3')
     GH_REPO = prompt_with_condition('GitHub Repo Id', lambda x: x.isdigit() ,'org id must be an int')
 
-  print colored('You must now create a new GitHub App to authenticate users', 'green')
+  print_instruction('You must now create a new GitHub App to authenticate users')
   open_or_print('https://github.com/organizations/{}/settings/applications/new'.format(GH_ORG_NAME))
-  print colored('Enter an Application Name, and anything as the Homepage URL (for now)', 'green')
-  print colored("Click 'Register Application'", 'green')
+  print_instruction('Enter an Application Name, and anything as the Homepage URL (for now)')
+  print_instruction("Click 'Register Application'")
 
   GH_CLIENT_ID = prompt_with_length('GitHub Client Id', 20)
   GH_SECRET = prompt_with_length('GitHub Client Secret', 40)
@@ -140,7 +145,7 @@ def deploy(params):
       output = subprocess.check_output(['heroku', 'create'])
     params['APP_NAME'] = re.match(r'Creating (.*)\.\.\.', output).group(1)
   except subprocess.CalledProcessError:
-    sys.exit(colored('Heroku app creation failed!', 'red'))
+    exit_with_error('Heroku app creation failed!')
   config = map(lambda x: "{}={}".format(x[0], x[1]), params.items())
 
   print colored('Writing Heroku Config Vars To .env', 'magenta')
@@ -156,7 +161,7 @@ def deploy(params):
   call_without_output(['git', 'push', params['APP_NAME'], 'master'])
 
   colored("You need to update your GitHub App", 'green')
-  open_or_print('https://github.com/organizations/{}/settings/applications'.format(GH_ORG_NAME))
+  open_or_print('https://github.com/organizations/{}/settings/applications'.format(params['GH_ORG_NAME']))
 
   message = colored("Set your GitHub App's Homepage URL to ", 'green') \
   + colored("http://{}.herokuapp.com".format(params['APP_NAME']), 'cyan')
@@ -168,14 +173,13 @@ def deploy(params):
   print message
   prompt_with_condition('done? [y/n]', lambda x: x.lower() == 'y', message)
 
-  print colored("Save your settings by clicking 'Update Application'", 'green')
+  print_instruction("Save your settings by clicking 'Update Application'")
 
   print colored('Launching App!', 'magenta')
   call_without_output(['heroku', 'ps:scale', 'web=1'])
   call_without_output(['heroku', 'apps:open', '--app', params['APP_NAME']])
 
-  print colored('App URL: ', 'green') \
-  + colored('http://{}.herokuapp.com'.format(params['APP_NAME']), 'cyan')
+  print_instruction('App URL: ' + colored('http://{}.herokuapp.com'.format(params['APP_NAME']), 'cyan'))
 
 if __name__ == '__main__':
   DEVNULL = open(os.devnull, 'w')
@@ -185,4 +189,4 @@ if __name__ == '__main__':
     params = get_params()
     deploy(params)
   except KeyboardInterrupt:
-    sys.exit(colored('\nDeploy cancelled', 'red'))
+    exit_with_error('\nDeploy cancelled')
