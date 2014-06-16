@@ -5,12 +5,25 @@ from helpers.githubuser import GithubUser
 import os, time
 
 app = Flask(__name__)
+dev = os.environ.get('dev') == 'true' or not os.environ.get('PORT')
 constants = Constants(os.environ)
 app.secret_key = constants.get('SK')
 try:
   s3 = S3(constants.get('AWS_ACCESS_KEY'), constants.get('AWS_SECRET_KEY'), constants.get('AWS_BUCKET'))
 except:
   s3 = None
+
+@app.before_request
+def preprocess_request():
+  if request.endpoint in {'redirect_view', 'pending_view'}:
+    if session.get('verified') != True:
+     return redirect(url_for('login_view'))
+
+@app.after_request
+def postprocess_request(response):
+  if not dev:
+    response.headers.setdefault('Strict-Transport-Security', 'max-age=31536000')
+  return response
 
 @app.route('/')
 def index_view():
@@ -20,14 +33,15 @@ def index_view():
 def redirect_view(object_key):
   session['object_key'] = object_key
   if s3:
-    if session.get('verified') == True:
-      url = s3.get_url(object_key, constants.get('EXPIRES'))
-      return redirect(url)
-    else:
-      redirect(url_for('login_view'))
+    url = s3.get_url(object_key, constants.get('EXPIRES'))
+    return redirect(url if url else url_for('pending_view', object_key=object_key))
   else:
     flash('Your S3 keys are invalid!', 'danger')
     return redirect(url_for('demo_view'))
+
+@app.route('/pending/<object_key>')
+def pending_view(object_key):
+  return render_template('pending.html', object_key=object_key, bucket=constants.get('AWS_BUCKET'))
 
 @app.route('/login')
 def login_view():
@@ -69,7 +83,7 @@ def demo_view():
     return render_template('demo.html')
 
 if __name__ == '__main__':
-  if os.environ.get('PORT'):
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT')), debug=False)
-  else:
+  if dev:
     app.run(host='0.0.0.0', port=5000, debug=True)
+  else:
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT')), debug=False)

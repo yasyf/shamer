@@ -1,0 +1,14 @@
+{% extends "_base.html" %}
+{% block title %}Github S3 Auth Demo{% endblock %}
+{% block meta %}
+<meta http-equiv="refresh" content="5;URL='{{ url_for('redirect_view', object_key=object_key) }}'" />  
+{% endblock %}
+{% block body %}
+
+<h1>Waiting For <code>{{ object_key }}</code></h1>
+
+<p>
+  The object <code>{{ object_key }}</code> in the <code>{{ bucket }}</code> bucket is not currently available. Please wait for the upload to finish.
+</p>
+
+{% endblock %}

@@ -10,4 +10,4 @@ class S3():
 
   def get_url(object_key, expires):
     key = self.bucket.get_key(object_key)
-    return key.generate_url(expires, query_auth=True)
+    return key.generate_url(expires, query_auth=True) if key else None
