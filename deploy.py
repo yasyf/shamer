@@ -23,8 +23,6 @@ def check_for_heroku():
   subprocess.call(['heroku', 'auth:whoami'])
   print
   print colored('Welcome to the github-s3-auth deployer script!', 'green')
-  print colored('Please enter the following config vars.', 'green')
-  print
 
 def prompt_with_condition(message, condition, error):
   done = False
@@ -42,7 +40,18 @@ def prompt_need_response(var):
 def prompt_with_length(var, length):
   return prompt_with_condition(var, lambda x: len(x) == length, '{} must be {} characters long'.format(var, length))
 
+def params_dict(_locals):
+  params = ['APP_NAME', 'SK', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY','GH_ORG', 'GH_REPO', 'GH_ORG_NAME', 'GH_REPO_NAME', 'GH_CLIENT_ID', 'GH_SECRET']
+  return {param:_locals.get(param) for param in params}
+
 def get_params():
+  env_params = params_dict(locals())
+  if None not in env_params.values():
+    if prompt_need_response('use current environment variables? [y/n]').lower() == 'y':
+      return env_params
+
+  print colored('Please enter the following config vars.', 'green')
+  print
   APP_NAME = prompt('heroku app name (blank for random)') or ''
   SK = prompt('flask app secret key (blank for random)') or str(uuid.uuid4())
 
@@ -62,8 +71,7 @@ def get_params():
   GH_SECRET = prompt_with_length('github client secret', 40)
   
   _locals = locals()
-  params = ['APP_NAME', 'SK', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY','GH_ORG', 'GH_REPO', 'GH_ORG_NAME', 'GH_REPO_NAME', 'GH_CLIENT_ID', 'GH_SECRET']
-  return {param:_locals[param] for param in params}
+  return params_dict(_locals)
 
 def deploy(params):
   print colored('Creating Heroku App', 'magenta')
