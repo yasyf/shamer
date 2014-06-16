@@ -5,9 +5,10 @@
 {% endblock %}
 {% block body %}
 
-<h1>Waiting For <code>{{ object_key }}</code></h1>
+<h1>Pending Upload</h1>
 
 <p>
+  <h4>Waiting For <code>{{ object_key }}</code></h4>
   The object <code>{{ object_key }}</code> in the <code>{{ bucket }}</code> bucket is not currently available. Please wait for the upload to finish.
 </p>
 

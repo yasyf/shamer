@@ -1,9 +1,13 @@
 {% extends "_base.html" %}
 {% block title %}Login With Github{% endblock %}
 {% block body %}
+<h1>Github S3 Auth Demo</h1>
 
-<a href="{{ url_for('login_view') }}" class='btn btn-default'>
-  Login With Github
-</a>
+<p>
+  <h4>Login</h4>
+  <a href="{{ url_for('login_view') }}" class='btn btn-default'>
+    Login With Github
+  </a>
+</p>
 
 {% endblock %}
