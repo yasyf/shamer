@@ -15,10 +15,14 @@ except:
 
 @app.before_request
 def preprocess_request():
-  if request.endpoint in {'redirect_view', 'pending_view'}:
+  if request.endpoint in {'redirect_view', 'proxy_view', 'pending_view'}:
     session['object_key'] = request.view_args.get('object_key')
     if session.get('verified') != True:
       return redirect(url_for('login_view'))
+    if not s3:
+      flash('Your S3 keys are invalid!', 'danger')
+      return redirect(url_for('demo_view'))
+
 
 @app.after_request
 def postprocess_request(response):
@@ -32,12 +36,13 @@ def index_view():
 
 @app.route('/redirect/<object_key>')
 def redirect_view(object_key):
-  if s3:
-    url = s3.get_url(object_key, constants.get('EXPIRES'))
-    return redirect(url if url else url_for('pending_view', object_key=object_key))
-  else:
-    flash('Your S3 keys are invalid!', 'danger')
-    return redirect(url_for('demo_view'))
+  url = s3.get_url(object_key, constants.get('EXPIRES'))
+  return redirect(url if url else url_for('pending_view', object_key=object_key))
+
+@app.route('/proxy/<object_key>')
+def proxy_view(object_key):
+  f = s3.get_file(object_key)
+  return f.read()
 
 @app.route('/pending/<object_key>')
 def pending_view(object_key):

@@ -1,4 +1,4 @@
-import boto
+import boto, os
 import boto.s3.connection
 
 class S3():
@@ -7,7 +7,17 @@ class S3():
       aws_access_key_id=access_key,
       aws_secret_access_key=secret_key)
     self.bucket = self.conn.get_bucket(bucket)
+    if not os.path.exists('cache'):
+      os.makedirs('cache')
 
   def get_url(object_key, expires):
     key = self.bucket.get_key(object_key)
     return key.generate_url(expires, query_auth=True) if key else None
+
+  def get_file(object_key):
+    path = 'cache/{}'.format(object_key)
+    if not os.path.exists(path):
+      key = self.bucket.get_key(object_key)
+      key.get_contents_to_filename(path)
+    return open(path, 'r')
+
