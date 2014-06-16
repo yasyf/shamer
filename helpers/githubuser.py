@@ -2,7 +2,7 @@ from github import Github
 import requests
 
 class GithubUser():
-  def __init__(self, code=None, token=None, client_id=None, secret=None):
+  def __init__(self, token=None, code=None, client_id=None, secret=None):
     self.token = token or self.get_token(code, client_id, secret)
     self.g = Github(self.token)
     self.user = self.g.get_user()

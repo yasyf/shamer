@@ -81,12 +81,14 @@ def get_gh_auth():
   return (GH_USER, GH_PASSWORD)
 
 def params_dict(_locals):
-  params = ['APP_NAME', 'SK', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY', 'GH_ORG', 'GH_REPO', 'GH_ORG_NAME', 'GH_REPO_NAME', 'GH_CLIENT_ID', 'GH_SECRET']
+  params = ['APP_NAME', 'SK', 'MODE', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY', 'GH_ORG', 'GH_REPO', \
+   'GH_ORG_NAME', 'GH_REPO_NAME', 'GH_CLIENT_ID', 'GH_SECRET', 'GH_BOT_TOKEN', 'GH_BOT_MESSAGE']
   return {param:_locals.get(param) for param in params}
 
 def get_params():
   env_params = params_dict(locals())
-  if None not in env_params.values():
+  optional_params = ['GH_BOT_TOKEN', 'GH_BOT_MESSAGE']
+  if None not in set(env_params.values()) - set(optional_params):
     if prompt_get_yes_no('Use current environment variables'):
       return env_params
 
@@ -110,7 +112,7 @@ def get_params():
     print colored('Could not automatically find that GitHub Organization!', 'red')
     print_instruction('Use the GitHub API to get your org id')
     open_or_print('https://developer.github.com/v3')
-    GH_ORG = prompt_with_condition('GitHub Org Id', lambda x: x.isdigit() ,'org id must be an int')
+    GH_ORG = prompt_with_condition('GitHub Org Id', lambda x: x.isdigit() ,'Org Id must be an int')
  
   print colored('Trying to fetch your repo id from the GitHub API', 'magenta')
   try:
@@ -123,7 +125,7 @@ def get_params():
     print colored('Could not automatically find that GitHub Repo!', 'red')
     print_instruction('Use the GitHub API to get your org id')
     open_or_print('https://developer.github.com/v3')
-    GH_REPO = prompt_with_condition('GitHub Repo Id', lambda x: x.isdigit() ,'org id must be an int')
+    GH_REPO = prompt_with_condition('GitHub Repo Id', lambda x: x.isdigit() ,'Repo Id must be an int')
 
   print_instruction('You must now create a new GitHub App to authenticate users')
   open_or_print('https://github.com/organizations/{}/settings/applications/new'.format(GH_ORG_NAME))
@@ -132,7 +134,20 @@ def get_params():
 
   GH_CLIENT_ID = prompt_with_length('GitHub Client Id', 20)
   GH_SECRET = prompt_with_length('GitHub Client Secret', 40)
+
+  print_instruction('Your instance can redirect to S3 links, or proxy the files directly from S3')
+  MODE = prompt_with_condition('Mode [redirect/proxy]', lambda x: x in {'redirect', 'proxy'} ,'Mode must be redirect or proxy')
   
+  if prompt_get_yes_no('Would you like a webhook for commenting on pull requests?')
+    print_instruction('Create a new GitHub User to be your bot, and give it permissions for your repo')
+    print_instruction('Generate a new access token for your bot, with all repo permissions allowed')
+    open_or_print('https://github.com/settings/tokens/new')
+    GH_BOT_TOKEN = prompt_need_response('Personal access token')
+    GH_BOT_MESSAGE = prompt_need_response('Default comment message')
+  else:
+    GH_BOT_TOKEN = None
+    GH_BOT_MESSAGE = None
+
   _locals = locals()
   return params_dict(_locals)
 

@@ -1,7 +1,8 @@
-from flask import Flask, redirect, session, request, render_template, url_for, flash
+from flask import Flask, redirect, session, request, render_template, url_for, flash, jsonify
 from helpers.s3 import S3
 from helpers.constants import Constants
 from helpers.githubuser import GithubUser
+from helpers.githubbot import GithubBot
 import os, time
 
 app = Flask(__name__)
@@ -13,6 +14,11 @@ try:
 except:
   s3 = None
 
+try:
+  bot = GithubBot(constants.get('GH_ORG_NAME'), constants.get('GH_REPO_NAME'), constants.get('GH_BOT_TOKEN'))
+except:
+  bot = None
+
 @app.before_request
 def preprocess_request():
   if request.endpoint in {'redirect_view', 'proxy_view', 'pending_view'}:
@@ -22,7 +28,6 @@ def preprocess_request():
     if not s3:
       flash('Your S3 keys are invalid!', 'danger')
       return redirect(url_for('demo_view'))
-
 
 @app.after_request
 def postprocess_request(response):
@@ -81,6 +86,14 @@ def callback_view():
     object_key = session.pop('object_key')
     return redirect(url_for('redirect_view', object_key=object_key))
   return redirect(url_for('demo_view'))
+
+@app.route('/hook/<pull_request_id>/<object_key>')
+def hook_view(pull_request_id, object_key):
+  if bot and pull_request_id.isdigit():
+    url = url_for('go_view', object_key=object_key, _external=True)
+    message = constants.get('GH_BOT_MESSAGE')
+    bot.comment(int(pull_request_id), message, url)
+  return jsonify({'status': 'success'})
 
 @app.route('/demo')
 def demo_view():
