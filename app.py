@@ -44,6 +44,10 @@ def proxy_view(object_key):
   f = s3.get_file(object_key)
   return f.read()
 
+@app.route('/go/<object_key>')
+def go_view(object_key):
+  return redirect(url_for('{}_view'.format(constants.get('MODE')), object_key=object_key))
+
 @app.route('/pending/<object_key>')
 def pending_view(object_key):
   return render_template('pending.html', object_key=object_key, bucket=constants.get('AWS_BUCKET'))
