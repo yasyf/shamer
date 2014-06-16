@@ -16,8 +16,9 @@ except:
 @app.before_request
 def preprocess_request():
   if request.endpoint in {'redirect_view', 'pending_view'}:
+    session['object_key'] = request.view_args.get('object_key')
     if session.get('verified') != True:
-     return redirect(url_for('login_view'))
+      return redirect(url_for('login_view'))
 
 @app.after_request
 def postprocess_request(response):
@@ -31,7 +32,6 @@ def index_view():
 
 @app.route('/redirect/<object_key>')
 def redirect_view(object_key):
-  session['object_key'] = object_key
   if s3:
     url = s3.get_url(object_key, constants.get('EXPIRES'))
     return redirect(url if url else url_for('pending_view', object_key=object_key))
@@ -68,13 +68,14 @@ def callback_view():
     else:
       flash('Your GitHub credentials are not valid!', 'danger')
       session['verified'] = False
+  if session.get('object_key'):
+    object_key = session.pop('object_key')
+    return redirect(url_for('redirect_view', object_key=object_key))
   return redirect(url_for('demo_view'))
 
 @app.route('/demo')
 def demo_view():
   if session.get('token'):
-    if session.get('object_key'):
-      flash("Redirecting to '{}' on S3...".format(session.pop('object_key')), 'warning')
     return render_template('demo_user.html',
       user=GithubUser(token=session.get('token')),
       v_org=(constants.get('GH_ORG_NAME'), constants.get('GH_ORG')),
