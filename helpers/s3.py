@@ -10,9 +10,9 @@ class S3():
     if not os.path.exists('cache'):
       os.makedirs('cache')
 
-  def get_url(self, object_key, expires):
+  def get_url(self, object_key, expires, force_http=False):
     key = self.bucket.get_key(object_key)
-    return key.generate_url(expires, query_auth=True) if key else None
+    return key.generate_url(expires, query_auth=True, force_http=force_http) if key else None
 
   def get_file(self, object_key):
     path = 'cache/{}'.format(object_key)

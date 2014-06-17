@@ -45,7 +45,7 @@ def index_view():
 
 @app.route('/redirect')
 def redirect_view():
-  url = s3.get_url(g.object_key, constants.get('EXPIRES'))
+  url = s3.get_url(g.object_key, int(constants.get('EXPIRES')), force_http=constants.get('HTTP') == 'true')
   return redirect(url if url else url_for('pending_view', object_key=g.object_key))
 
 @app.route('/proxy')
