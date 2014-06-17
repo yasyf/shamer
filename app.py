@@ -1,4 +1,4 @@
-from flask import Flask, redirect, session, request, render_template, url_for, flash, jsonify
+from flask import Flask, redirect, session, request, render_template, url_for, flash, jsonify, g
 from helpers.s3 import S3
 from helpers.constants import Constants
 from helpers.githubuser import GithubUser
@@ -21,13 +21,17 @@ except:
 
 @app.before_request
 def preprocess_request():
-  if request.endpoint in {'redirect_view', 'proxy_view', 'pending_view'}:
-    session['object_key'] = request.view_args.get('object_key')
+  if request.endpoint in {'redirect_view', 'proxy_view', 'pending_view', 'go_view'}:
     if session.get('verified') != True:
       return redirect(url_for('login_view'))
     if not s3:
       flash('Your S3 keys are invalid!', 'danger')
       return redirect(url_for('demo_view'))
+    g.object_key = request.args.get('object_key')
+    if not g.object_key:
+      flash('No object key was set!', 'danger')
+      return redirect(url_for('demo_view'))
+    session['object_key'] = g.object_key
 
 @app.after_request
 def postprocess_request(response):
@@ -39,23 +43,23 @@ def postprocess_request(response):
 def index_view():
   return redirect(url_for('demo_view'))
 
-@app.route('/redirect/<object_key>')
-def redirect_view(object_key):
-  url = s3.get_url(object_key, constants.get('EXPIRES'))
-  return redirect(url if url else url_for('pending_view', object_key=object_key))
+@app.route('/redirect')
+def redirect_view():
+  url = s3.get_url(g.object_key, constants.get('EXPIRES'))
+  return redirect(url if url else url_for('pending_view', object_key=g.object_key))
 
-@app.route('/proxy/<object_key>')
-def proxy_view(object_key):
-  f = s3.get_file(object_key)
+@app.route('/proxy')
+def proxy_view():
+  f = s3.get_file(g.object_key)
   return f.read()
 
-@app.route('/go/<object_key>')
-def go_view(object_key):
-  return redirect(url_for('{}_view'.format(constants.get('MODE')), object_key=object_key))
+@app.route('/go')
+def go_view():
+  return redirect(url_for('{}_view'.format(constants.get('MODE')), object_key=g.object_key))
 
-@app.route('/pending/<object_key>')
-def pending_view(object_key):
-  return render_template('pending.html', object_key=object_key, bucket=constants.get('AWS_BUCKET'))
+@app.route('/pending')
+def pending_view():
+  return render_template('pending.html', object_key=g.object_key, bucket=constants.get('AWS_BUCKET'))
 
 @app.route('/login')
 def login_view():
@@ -87,8 +91,11 @@ def callback_view():
     return redirect(url_for('redirect_view', object_key=object_key))
   return redirect(url_for('demo_view'))
 
-@app.route('/hook/<pull_request_id>/<object_key>')
-def hook_view(pull_request_id, object_key):
+@app.route('/hook/<pull_request_id>')
+def hook_view(pull_request_id):
+  object_key = request.args.get('object_key')
+  if not object_key:
+    return jsonify({'status': 'no object_key'})
   if bot:
     if not pull_request_id.isdigit():
       try:
