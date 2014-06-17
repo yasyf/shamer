@@ -39,21 +39,21 @@ def postprocess_request(response):
 def index_view():
   return redirect(url_for('demo_view'))
 
-@app.route('/redirect/<object_key>')
+@app.route('/redirect/<path:object_key>')
 def redirect_view(object_key):
   url = s3.get_url(object_key, constants.get('EXPIRES'), force_http=constants.get('HTTP') == 'true')
   return redirect(url if url else url_for('pending_view', object_key=object_key))
 
-@app.route('/proxy/<object_key>')
+@app.route('/proxy/<path:object_key>')
 def proxy_view(object_key):
   f = s3.get_file(object_key)
   return f.read() if f else redirect(url_for('pending_view', object_key=object_key))
 
-@app.route('/go/<object_key>')
+@app.route('/go/<path:object_key>')
 def go_view(object_key):
   return redirect(url_for('{}_view'.format(constants.get('MODE')), object_key=object_key))
 
-@app.route('/pending/<object_key>')
+@app.route('/pending/<path:object_key>')
 def pending_view(object_key):
   return render_template('pending.html', object_key=object_key, bucket=constants.get('AWS_BUCKET'))
 
@@ -87,7 +87,7 @@ def callback_view():
     return redirect(url_for('go_view', object_key=object_key))
   return redirect(url_for('demo_view'))
 
-@app.route('/hook/<pull_request_id>/<object_key>')
+@app.route('/hook/<pull_request_id>/<path:object_key>')
 def hook_view(pull_request_id, object_key):
   if bot:
     if not pull_request_id.isdigit():
