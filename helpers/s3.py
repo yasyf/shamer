@@ -1,4 +1,4 @@
-import boto, os
+import boto, os, datetime
 import boto.s3.connection
 
 class S3():
@@ -7,6 +7,7 @@ class S3():
       aws_access_key_id=access_key,
       aws_secret_access_key=secret_key)
     self.bucket = self.conn.get_bucket(bucket)
+    self.times = {}
     if not os.path.exists('cache'):
       os.makedirs('cache')
 
@@ -15,6 +16,7 @@ class S3():
     return key.generate_url(expires, query_auth=True, force_http=force_http) if key else None
 
   def get_file(self, object_key):
+    now = datetime.datetime.utcnow()
     path = 'cache/{}'.format(object_key)
     if not os.path.exists(path):
       try:
@@ -23,10 +25,11 @@ class S3():
         pass
       key = self.bucket.get_key(object_key)
       if not key:
-        return None
+        return (None, now)
       key.get_contents_to_filename(path)
+      self.times[object_key] = now
     if not os.path.isdir(path):
-      return open(path, 'r')
+      return (open(path, 'r'), self.times.get(object_key, now))
     else:
       return self.get_file(os.path.join(object_key, 'index.html'))
 

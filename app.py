@@ -1,9 +1,9 @@
-from flask import Flask, redirect, session, request, render_template, url_for, flash, jsonify, send_file
+from flask import Flask, redirect, session, request, render_template, url_for, flash, jsonify, send_file, make_response
 from helpers.s3 import S3
 from helpers.constants import Constants
 from helpers.githubuser import GithubUser
 from helpers.githubbot import GithubBot
-import os, time
+import os, time, datetime
 
 app = Flask(__name__)
 dev = os.environ.get('dev') == 'true' or not os.environ.get('PORT')
@@ -35,6 +35,13 @@ def postprocess_request(response):
     response.headers.setdefault('Strict-Transport-Security', 'max-age=31536000')
   return response
 
+def cached(response_data, since, expires=86400):
+  response = make_response(response_data)
+  response.headers['Last-Modified'] = since
+  response.headers['Expires'] = since + datetime.timedelta(seconds=expires)
+  response.headers['Cache-Control'] = 'public, max-age={}'.format(expires)
+  return response
+
 @app.route('/')
 def index_view():
   return redirect(url_for('demo_view'))
@@ -46,8 +53,8 @@ def redirect_view(object_key):
 
 @app.route('/proxy/<path:object_key>')
 def proxy_view(object_key):
-  f = s3.get_file(object_key)
-  return send_file(f) if f else redirect(url_for('pending_view', object_key=object_key))
+  f, since = s3.get_file(object_key)
+  return cached(send_file(f), since) if f else redirect(url_for('pending_view', object_key=object_key))
 
 @app.route('/go/<path:object_key>')
 def go_view(object_key):
