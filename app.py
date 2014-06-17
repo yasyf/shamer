@@ -88,7 +88,7 @@ def callback_view():
       session['verified'] = False
   if session.get('object_key'):
     object_key = session.pop('object_key')
-    return redirect(url_for('redirect_view', object_key=object_key))
+    return redirect(url_for('go_view', object_key=object_key))
   return redirect(url_for('demo_view'))
 
 @app.route('/hook/<pull_request_id>')

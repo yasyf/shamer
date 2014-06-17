@@ -28,5 +28,5 @@ class S3():
     if not os.path.isdir(path):
       return open(path, 'r')
     else:
-      return self.get_file(os.path.join(path, 'index.html'))
+      return self.get_file(os.path.join(object_key, 'index.html'))
 
