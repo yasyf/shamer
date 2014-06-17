@@ -25,5 +25,8 @@ class S3():
       if not key:
         return None
       key.get_contents_to_filename(path)
-    return open(path, 'r')
+    if not os.path.isdir(path):
+      return open(path, 'r')
+    else:
+      return self.get_file(os.path.join(path, 'index.html'))
 
