@@ -93,7 +93,8 @@ def hook_view(pull_request_id, object_key):
     url = url_for('go_view', object_key=object_key, _external=True)
     message = constants.get('GH_BOT_MESSAGE')
     bot.comment(int(pull_request_id), message, url)
-  return jsonify({'status': 'success'})
+    return jsonify({'status': 'success'})
+  return jsonify({'status': 'failure'})
 
 @app.route('/demo')
 def demo_view():
