@@ -89,12 +89,18 @@ def callback_view():
 
 @app.route('/hook/<pull_request_id>/<object_key>')
 def hook_view(pull_request_id, object_key):
-  if bot and pull_request_id.isdigit():
+  if bot:
+    if not pull_request_id.isdigit():
+      try:
+        # pull_request_id is the branch name
+        pull_request_id = bot.get_pr_by_branch(pull_request_id).number
+      except:
+        return jsonify({'status': 'no such pull request'})
     url = url_for('go_view', object_key=object_key, _external=True)
     message = constants.get('GH_BOT_MESSAGE')
     bot.comment(int(pull_request_id), message, url)
     return jsonify({'status': 'success'})
-  return jsonify({'status': 'failure'})
+  return jsonify({'status': 'no bot credentials'})
 
 @app.route('/demo')
 def demo_view():

@@ -14,3 +14,8 @@ class GithubBot():
       pr = self.repo.get_pull(pull_request_id)
       body = "{}: [{}]({})".format(message, pr.title, url)
       pr.create_issue_comment(body)
+
+  def get_pr_by_branch(self, branch_name):
+    for pull in self.repo.get_pulls(state='open'):
+      if pull.head.ref == branch_name:
+        return pull
