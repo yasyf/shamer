@@ -138,8 +138,10 @@ def get_params():
   print_instruction('Your instance can redirect to S3 links, or proxy the files directly from S3')
   MODE = prompt_with_condition('Mode [redirect/proxy]', lambda x: x in {'redirect', 'proxy'} ,'Mode must be redirect or proxy')
   
-  if prompt_get_yes_no('Would you like a webhook for commenting on pull requests?')
+  if prompt_get_yes_no('Would you like a webhook for commenting on pull requests?'):
     print_instruction('Create a new GitHub User to be your bot, and give it permissions for your repo')
+    open_or_print('https://github.com/join')
+    open_or_print('https://github.com/orgs/{}/members'.format(GH_ORG_NAME))
     print_instruction('Generate a new access token for your bot, with all repo permissions allowed')
     open_or_print('https://github.com/settings/tokens/new')
     GH_BOT_TOKEN = prompt_need_response('Personal access token')
