@@ -35,7 +35,7 @@
   $(document).ready(function() {
     $('#object_key_btn').click(function() {
       object_key = $('#object_key').val();
-      url = "{{ url_for('redirect_view') }}?object_key=" + encodeURIComponent(object_key);
+      url = "{{ url_for('redirect_view', object_key='object_key') }}".replace('object_key',object_key);
       window.location = url;
     });
   });
