@@ -17,7 +17,13 @@ class S3():
   def get_file(self, object_key):
     path = 'cache/{}'.format(object_key)
     if not os.path.exists(path):
+      try:
+        os.makedirs(os.path.dirname(path))
+      except OSError:
+        pass
       key = self.bucket.get_key(object_key)
+      if not key:
+        return None
       key.get_contents_to_filename(path)
     return open(path, 'r')
 

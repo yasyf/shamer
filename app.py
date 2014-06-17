@@ -51,7 +51,7 @@ def redirect_view():
 @app.route('/proxy')
 def proxy_view():
   f = s3.get_file(g.object_key)
-  return f.read()
+  return f.read() if f else redirect(url_for('pending_view', object_key=g.object_key))
 
 @app.route('/go')
 def go_view():
