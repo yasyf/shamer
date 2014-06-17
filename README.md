@@ -19,3 +19,8 @@ $ cd github-s3-auth
 $ sudo pip install requests termcolor
 $ ./deploy.py
 ```
+
+To reuse your config from the last deploy, edit `.env` as needed, then run the deploy script with `foreman` to pre-populate your environment.
+```
+$ foreman run ./deploy.py
+```

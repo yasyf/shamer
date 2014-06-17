@@ -164,10 +164,11 @@ def deploy(params):
   except subprocess.CalledProcessError:
     exit_with_error('Heroku app creation failed!')
   config = map(lambda x: "{}={}".format(x[0], x[1]), params.items())
+  quoted_config = map(lambda x: "{}='{}'".format(x[0], x[1]), params.items())
 
   print colored('Writing Heroku Config Vars To .env', 'magenta')
   with open('.env', 'w') as f:
-    f.write("\n".join(config))
+    f.write("\n".join(quoted_config))
 
   print colored('Setting Heroku Config Vars', 'magenta')
   call_without_output(['heroku', 'config:set'] + config + ['--app', params['APP_NAME']])
