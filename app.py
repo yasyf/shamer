@@ -39,7 +39,10 @@ def cached(response_data, since, expires=86400):
   response = make_response(response_data)
   response.headers['Last-Modified'] = since
   response.headers['Expires'] = since + datetime.timedelta(seconds=expires)
-  response.headers['Cache-Control'] = 'public, max-age={}'.format(expires)
+  if expires > 0:
+    response.headers['Cache-Control'] = 'public, max-age={}'.format(expires)
+  else:
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
   return response
 
 @app.route('/')
@@ -49,7 +52,8 @@ def index_view():
 @app.route('/redirect/<path:object_key>')
 def redirect_view(object_key):
   url = s3.get_url(object_key, constants.get('EXPIRES'), force_http=constants.get('HTTP') == 'true')
-  return redirect(url if url else url_for('pending_view', object_key=object_key))
+  response = redirect(url if url else url_for('pending_view', object_key=object_key))
+  return cached(response, datetime.datetime.utcnow(), expires=0)
 
 @app.route('/proxy/<path:object_key>')
 def proxy_view(object_key):
@@ -58,11 +62,13 @@ def proxy_view(object_key):
 
 @app.route('/go/<path:object_key>')
 def go_view(object_key):
-  return redirect(url_for('{}_view'.format(constants.get('MODE')), object_key=object_key))
+  response = redirect(url_for('{}_view'.format(constants.get('MODE')), object_key=object_key))
+  return cached(response, datetime.datetime.utcnow(), expires=0)
 
 @app.route('/pending/<path:object_key>')
 def pending_view(object_key):
-  return render_template('pending.html', object_key=object_key, bucket=constants.get('AWS_BUCKET'))
+  response = render_template('pending.html', object_key=object_key, bucket=constants.get('AWS_BUCKET'), time=time.time())
+  return cached(response, datetime.datetime.utcnow(), expires=0)
 
 @app.route('/login')
 def login_view():

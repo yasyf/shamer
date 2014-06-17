@@ -1,7 +1,11 @@
 {% extends "_base.html" %}
 {% block title %}Github S3 Auth Demo{% endblock %}
 {% block meta %}
-<meta http-equiv="refresh" content="5;URL='{{ url_for('go_view', object_key=object_key) }}'" />  
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="max-age=0" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="cache-control" content="no-store" />
+<meta http-equiv="refresh" content="5;URL='{{ url_for('go_view', object_key=object_key) }}?time={{ time }}'" />
 {% endblock %}
 {% block body %}
 
