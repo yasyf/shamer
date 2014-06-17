@@ -1,4 +1,4 @@
-from flask import Flask, redirect, session, request, render_template, url_for, flash, jsonify
+from flask import Flask, redirect, session, request, render_template, url_for, flash, jsonify, send_file
 from helpers.s3 import S3
 from helpers.constants import Constants
 from helpers.githubuser import GithubUser
@@ -47,7 +47,7 @@ def redirect_view(object_key):
 @app.route('/proxy/<path:object_key>')
 def proxy_view(object_key):
   f = s3.get_file(object_key)
-  return f.read() if f else redirect(url_for('pending_view', object_key=object_key))
+  return send_file(f) if f else redirect(url_for('pending_view', object_key=object_key))
 
 @app.route('/go/<path:object_key>')
 def go_view(object_key):
