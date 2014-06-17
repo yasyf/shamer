@@ -24,3 +24,6 @@ To reuse your config from the last deploy, edit `.env` as needed, then run the d
 ```
 $ foreman run ./deploy.py
 ```
+##Customization
+
+The `jinja2` template at `templates/_comment.md` is how the service generates GitHub comments. We have included a sample that we use for adding code coverage notifiations to pull requests, but you can change this to suit your needs. 

@@ -1,4 +1,6 @@
 from github import Github
+from flask import render_template
+from jinja2 import TemplateNotFound
 
 class GithubBot():
   def __init__(self, org, repo, token, storage=None):
@@ -12,9 +14,12 @@ class GithubBot():
       if comment.user.id == self.user.id:
         return comment
 
-  def comment(self, pull_request_id, message, url):
+  def comment(self, pull_request_id, message, url, args):
     pr = self.repo.get_pull(pull_request_id)
-    body = "{}: [{}]({})".format(message, pr.title, url)
+    try:
+      body = render_template('_comment.md', pr=pr, url=url, args=args)
+    except TemplateNotFound:
+      body = "{}: [{}]({})".format(message, pr.title, url)
     past_comment = self.past_comment(pr)
     if past_comment:
       past_comment.edit(body)

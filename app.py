@@ -111,7 +111,7 @@ def hook_view(pull_request_id, object_key):
         return jsonify({'status': 'no such pull request'})
     url = url_for('go_view', object_key=object_key, _external=True)
     message = constants.get('GH_BOT_MESSAGE')
-    bot.comment(int(pull_request_id), message, url)
+    bot.comment(int(pull_request_id), message, url, request.args)
     return jsonify({'status': 'success'})
   return jsonify({'status': 'no bot credentials'})
 
