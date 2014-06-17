@@ -62,7 +62,8 @@ def proxy_view(object_key):
 
 @app.route('/go/<path:object_key>')
 def go_view(object_key):
-  response = redirect(url_for('{}_view'.format(constants.get('MODE')), object_key=object_key))
+  url = url_for('{}_view'.format(constants.get('MODE')), object_key=object_key)
+  response = redirect('{}?{}'.format(url, request.query_string))
   return cached(response, datetime.datetime.utcnow(), expires=0)
 
 @app.route('/pending/<path:object_key>')
