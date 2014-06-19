@@ -14,10 +14,10 @@ class GithubBot():
       if comment.user.id == self.user.id:
         return comment
 
-  def comment(self, pull_request_id, message, url, args):
+  def comment(self, pull_request_id, message, url, args, storage):
     pr = self.repo.get_pull(pull_request_id)
     try:
-      body = render_template('_comment.md', pr=pr, url=url, args=args)
+      body = render_template('_comment.md', pr=pr, url=url, args=args, storage=storage)
     except TemplateNotFound:
       body = "{}: [{}]({})".format(message, pr.title, url)
     past_comment = self.past_comment(pr)
