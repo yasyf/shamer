@@ -4,7 +4,8 @@ from pymongo import MongoClient
 class MongoConstants():
   def __init__(self, collection_name, mongo_uri):
     self.client = MongoClient(mongo_uri)
-    self.collection = self.client[collection_name]
+    db = mongo_uri.split('/')[-1]
+    self.collection = self.client[db][collection_name]
 
   def get(self, key):
     try:

@@ -11,6 +11,7 @@ app = Flask(__name__)
 dev = os.environ.get('dev') == 'true' or not os.environ.get('PORT')
 constants = Constants(OSConstants())
 app.secret_key = constants.get('SK')
+
 try:
   s3 = S3(constants.get('AWS_ACCESS_KEY'), constants.get('AWS_SECRET_KEY'), constants.get('AWS_BUCKET'))
 except:
@@ -20,6 +21,11 @@ try:
   bot = GithubBot(constants.get('GH_ORG_NAME'), constants.get('GH_REPO_NAME'), constants.get('GH_BOT_TOKEN'))
 except:
   bot = None
+
+try:
+  storage = Constants(MongoConstants('constants', constants.get('MONGO_URI')))
+except:
+  storage = None
 
 @app.before_request
 def preprocess_request():
@@ -107,8 +113,10 @@ def callback_view():
 def hook_view(pull_request_id, object_key):
   if bot:
     if not pull_request_id.isdigit():
+      # pull_request_id is the branch name
+      if storage:
+        storage.set(pull_request_id, request.args)
       try:
-        # pull_request_id is the branch name
         pull_request_id = bot.get_pr_by_branch(pull_request_id).number
       except:
         return jsonify({'status': 'no such pull request'})
