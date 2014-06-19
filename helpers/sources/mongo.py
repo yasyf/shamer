@@ -1,0 +1,16 @@
+import os
+from pymongo import MongoClient
+
+class MongoConstants():
+  def __init__(self, collection_name, mongo_uri):
+    self.client = MongoClient(mongo_uri)
+    self.collection = self.client[collection_name]
+
+  def get(self, key):
+    try:
+      return self.collection.find_one({'key': key})['value']
+    except AttributeError:
+      return None
+
+  def set(self, key, value):
+    self.collection.update({'key': key}, {'$set': {'value': value}}, upsert=True)

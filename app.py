@@ -3,11 +3,13 @@ from helpers.s3 import S3
 from helpers.constants import Constants
 from helpers.githubuser import GithubUser
 from helpers.githubbot import GithubBot
+from helpers.sources.osenv import OSConstants
+from helpers.sources.mongo import MongoConstants
 import os, time, datetime
 
 app = Flask(__name__)
 dev = os.environ.get('dev') == 'true' or not os.environ.get('PORT')
-constants = Constants(os.environ)
+constants = Constants(OSConstants())
 app.secret_key = constants.get('SK')
 try:
   s3 = S3(constants.get('AWS_ACCESS_KEY'), constants.get('AWS_SECRET_KEY'), constants.get('AWS_BUCKET'))
