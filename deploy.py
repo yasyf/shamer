@@ -80,10 +80,15 @@ def get_gh_auth():
   GH_PASSWORD = prompt_password('Your GitHub Password')
   return (GH_USER, GH_PASSWORD)
 
+def params_default():
+  return {'WEB_CONCURRENCY': 5}
+
 def params_dict(_locals):
   params = ['APP_NAME', 'SK', 'MODE', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY', 'GH_ORG', 'GH_REPO', \
    'GH_ORG_NAME', 'GH_REPO_NAME', 'GH_CLIENT_ID', 'GH_SECRET', 'GH_BOT_TOKEN', 'GH_BOT_MESSAGE']
-  return {param:_locals.get(param) for param in params}
+  d = {param:_locals.get(param) for param in params}
+  d.update(params_default())
+  return d
 
 def get_params():
   env_params = params_dict(locals())
