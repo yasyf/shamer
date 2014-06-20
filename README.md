@@ -4,6 +4,8 @@
 
 As an added bonus, we added a single webhook which can take any arbitrary parameters and use them to construct a comment to be posted on a GitHub pull request. We use this to post a link to relevant code coverage reports on every PR.
 
+The included deploy script, and features such as cache clearing, depend on this code being deployed to [Heroku](https://www.heroku.com/). If you are deploying to AWS or any other cloud provider, you will probably need to alter the code.
+
 ##Deploy Instructions
 
 Install `pip` if you haven't already.
