@@ -24,7 +24,6 @@ class GithubBot():
     if pull_request_id in recorded.keys():
       contribution['rb'] -= recorded[pull_request_id]['rb']
       contribution['js'] -= recorded[pull_request_id]['js']
-    
     rb = float(args.get('ruby', 0)) - float(storage.get('master')['ruby'][0])
     js = float(args.get('js', 0)) - float(storage.get('master')['js'][0])
     recorded[pull_request_id] = {'rb': rb, 'js': js}
@@ -32,12 +31,19 @@ class GithubBot():
     contribution['js'] += js
     user['contribution'] = contribution
     user['recorded'] = recorded
+    user['net_contribution'] = contribution['rb'] + contribution['js']
     storage.set(pr.user.login, user)
 
   def comment(self, pull_request_id, message, url, args, storage):
     pr = self.repo.get_pull(pull_request_id)
+    user = storage.get(pr.user.login)
+    rank = None
+    if user:
+      all_users = [x['value']['login'] for x in storage.source.collection.find({'value.contribution': \
+        {'$exists': True}}).sort('value.net_contribution', -1)]
+      rank = (all_users.index(pr.user.login) + 1, len(all_users))
     try:
-      body = render_template('_comment.md', pr=pr, url=url, args=args, storage=storage)
+      body = render_template('_comment.md', pr=pr, url=url, args=args, storage=storage, rank=rank)
     except TemplateNotFound:
       body = "{}: [{}]({})".format(message, pr.title, url)
     past_comment = self.past_comment(pr)

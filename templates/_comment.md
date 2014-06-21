@@ -21,3 +21,7 @@ Current coverage for `{{ pr.head.ref }}` is at **{{ args.ruby }}**%
 Current coverage for `{{ pr.head.ref }}` is at **{{ args.js }}**%
 **{{ args.js|float - storage.get('master').js[0]|float }}**% change from `master`
 {% endif %}
+
+{% if rank %}
+Your rank on the [Localytics Coverage Leaderboard]({{ url_for('leaderboard_view') }}) is **{{ rank[0] }}** out of **{{ rank[1] }}**!
+{% endif %}
