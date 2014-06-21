@@ -19,7 +19,7 @@
       <tr
       {% if (user.contribution.rb + user.contribution.js) > 0 %}
         class="success"
-      {% elif if (user.contribution.rb + user.contribution.js) < 0 %}
+      {% elif (user.contribution.rb + user.contribution.js) < 0 %}
         class="danger"
       {% endif %}
       >
