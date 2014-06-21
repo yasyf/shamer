@@ -16,5 +16,5 @@ class MongoConstants():
   def set(self, key, value):
     self.collection.update({'key': key}, {'$set': {'value': value}}, upsert=True)
 
-  def all(self, constraint):
-    return [x.get('value') for x in self.collection.find(constraint)]
+  def all(self, constraint, sort):
+    return [x.get('value') for x in self.collection.find(constraint).sort(*sort)]

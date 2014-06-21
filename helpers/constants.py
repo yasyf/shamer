@@ -15,4 +15,5 @@ class Constants():
     try:
       return self.source.all(*args)
     except:
+      raise
       return self.source

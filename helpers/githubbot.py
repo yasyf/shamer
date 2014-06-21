@@ -39,8 +39,8 @@ class GithubBot():
     user = storage.get(pr.user.login)
     rank = None
     if user:
-      all_users = [x['value']['login'] for x in storage.source.collection.find({'value.contribution': \
-        {'$exists': True}}).sort('value.net_contribution', -1)]
+      all_users = [x['login'] for x in storage.all({'value.contribution': \
+        {'$exists': True}}, ('value.net_contribution', -1))]
       rank = (all_users.index(pr.user.login) + 1, len(all_users))
     try:
       body = render_template('_comment.md', pr=pr, url=url, args=args, storage=storage, rank=rank)

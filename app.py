@@ -143,7 +143,8 @@ def demo_view():
 @app.route('/leaderboard')
 def leaderboard_view():
   if session.get('token'):
-    return render_template('leaderboard.html', leaderboard=storage.all({'value.contribution': {'$exists': True}}))
+    return render_template('leaderboard.html', \
+      leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
   else:    
     return render_template('demo.html')
 
