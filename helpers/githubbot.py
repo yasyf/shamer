@@ -18,15 +18,17 @@ class GithubBot():
   def update_leaderboard(self, pull_request_id, args, storage):
     pr = self.repo.get_pull(pull_request_id)
     user = storage.get(pr.user.login) or {'name': pr.user.name, 'login': pr.user.login}
-    recorded = user.get('recorded', [])
-    if pull_request_id not in recorded:
-      recorded.append(pull_request_id)
-      contribution = user.get('contribution', {'rb': 0, 'js': 0})
-      contribution['rb'] += (float(args.get('ruby', 0)) - float(storage.get('master')['ruby'][0]))
-      contribution['js'] += (float(args.get('js', 0)) - float(storage.get('master')['js'][0]))
-      user['contribution'] = contribution
-      user['recorded'] = recorded
-      storage.set(pr.user.login, user)
+    recorded = user.get('recorded', {})
+    contribution = user.get('contribution', {'rb': 0, 'js': 0})
+    if pull_request_id in recorded.keys():
+      contribution['rb'] -= recorded[pull_request_id]['rb']
+      contribution['js'] -= recorded[pull_request_id]['js']
+    recorded[pull_request_id] = {'rb': float(args.get('ruby', 0)), 'js': float(args.get('js', 0))}
+    contribution['rb'] += (recorded[pull_request_id]['rb'] - float(storage.get('master')['ruby'][0]))
+    contribution['js'] += (recorded[pull_request_id]['js'] - float(storage.get('master')['js'][0]))
+    user['contribution'] = contribution
+    user['recorded'] = recorded
+    storage.set(pr.user.login, user)
 
   def comment(self, pull_request_id, message, url, args, storage):
     pr = self.repo.get_pull(pull_request_id)
