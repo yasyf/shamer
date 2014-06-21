@@ -23,7 +23,11 @@
         class="danger"
       {% endif %}
       >
+        {% if user.name %}
         <td>{{ user.name }} ({{ user.login }})</td>
+        {% else %}
+        <td>{{ user.login }}</td>
+        {% endif %}
         <td>{{ user.contribution.rb }}%</td>
         <td>{{ user.contribution.js }}%</td>
       </tr>
