@@ -10,7 +10,7 @@ class MongoConstants():
   def get(self, key):
     try:
       return self.collection.find_one({'key': key})['value']
-    except AttributeError:
+    except (AttributeError,TypeError):
       return None
 
   def set(self, key, value):
