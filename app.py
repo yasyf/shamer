@@ -32,7 +32,10 @@ def preprocess_request():
   if request.endpoint in {'redirect_view', 'proxy_view', 'pending_view'}:
     session['object_key'] = request.view_args.get('object_key')
     if session.get('verified') != True:
+      session['next'] = request.url
       return redirect(url_for('login_view'))
+    if session.get('next'):
+      return redirect(session.pop('next'))
     if not s3:
       flash('Your S3 keys are invalid!', 'danger')
       return redirect(url_for('demo_view'))
