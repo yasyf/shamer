@@ -10,3 +10,9 @@ class Constants():
 
   def set(self, key, value):
     self.source.set(key, value)
+
+  def all(self, *args):
+    try:
+      return self.source.all(*args)
+    except:
+      return self.source

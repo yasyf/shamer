@@ -10,8 +10,11 @@ class MongoConstants():
   def get(self, key):
     try:
       return self.collection.find_one({'key': key})['value']
-    except AttributeError:
+    except TypeError:
       return None
 
   def set(self, key, value):
     self.collection.update({'key': key}, {'$set': {'value': value}}, upsert=True)
+
+  def all(self, constraint):
+    return [x.get('value') for x in self.collection.find(constraint)]

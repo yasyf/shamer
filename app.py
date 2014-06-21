@@ -123,6 +123,7 @@ def hook_view(pull_request_id, object_key):
     url = url_for('go_view', object_key=object_key, _external=True)
     message = constants.get('GH_BOT_MESSAGE')
     bot.comment(int(pull_request_id), message, url, request.args, storage)
+    bot.update_leaderboard(pull_request_id, request.args, storage)
     return jsonify({'status': 'success'})
   return jsonify({'status': 'no bot credentials'})
 
@@ -133,6 +134,13 @@ def demo_view():
       user=GithubUser(token=session.get('token')),
       v_org=(constants.get('GH_ORG_NAME'), constants.get('GH_ORG')),
       v_repo=(constants.get('GH_REPO_NAME'), constants.get('GH_REPO')))
+  else:    
+    return render_template('demo.html')
+
+@app.route('/leaderboard')
+def leaderboard_view():
+  if session.get('token'):
+    return render_template('leaderboard.html', leaderboard=storage.all({'value.contribution': {'$exists': True}}))
   else:    
     return render_template('demo.html')
 

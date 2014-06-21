@@ -1,0 +1,39 @@
+{% extends "_base.html" %}
+{% block title %}Leaderboard{% endblock %}
+{% block meta %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/stupidtable/0.0.1/stupidtable.min.js"></script>
+{% endblock %}
+{% block body %}
+<h1>Leaderboard</h1>
+
+<table id="leaderboard" class="table table-striped">
+  <thead>
+      <tr>
+        <th data-sort="string">User</th>
+        <th data-sort="float">Ruby Coverage</th>
+        <th data-sort="float">JS Coverage</th>
+      </tr>
+  </thead>
+  <tbody>
+    {% for user in leaderboard %}
+      <tr
+      {% if (user.contribution.rb + user.contribution.js) > 0 %}
+        class="success"
+      {% elif if (user.contribution.rb + user.contribution.js) < 0 %}
+        class="danger"
+      {% endif %}
+      >
+        <td>{{ user.name }} ({{ user.login }})</td>
+        <td>{{ user.contribution.rb }}%</td>
+        <td>{{ user.contribution.js }}%</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+$( document ).ready(function() {
+  $("#leaderboard").stupidtable();
+});
+</script>
+{% endblock %}
