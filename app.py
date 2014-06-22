@@ -1,7 +1,7 @@
 from flask import Flask, redirect, session, request, render_template, url_for, flash, jsonify, send_file, make_response
 from helpers.s3 import S3
 from helpers.constants import Constants
-from helpers.githubuser import GithubUser
+from helpers.githubuser import GithubUser, PublicGithubUser
 from helpers.githubbot import GithubBot
 from helpers.sources.osenv import OSConstants
 from helpers.sources.mongo import MongoConstants
@@ -146,7 +146,17 @@ def leaderboard_view():
     return render_template('leaderboard.html', \
       leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
   else:    
-    return render_template('demo.html')
+    return redirect(url_for('demo_view'))
+
+@app.route('/leaderboard/user/<login>')
+def user_leaderboard_view(login):
+  if session.get('token'):
+    recorded = storage.get(login).get('recorded')
+    all_pr = {x:bot.repo.get_pull(int(x)) for x in recorded}
+    user = PublicGithubUser(login)
+    return render_template('user_leaderboard.html', recorded=recorded, all_pr=all_pr, user=user)
+  else:    
+    return redirect(url_for('demo_view'))
 
 if __name__ == '__main__':
   if dev:

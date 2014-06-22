@@ -1,36 +1,32 @@
 {% extends "_base.html" %}
-{% block title %}Leaderboard{% endblock %}
+{% block title %}{{ user.name or user.login }}'s Leaderboard{% endblock %}
 {% block js %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/stupidtable/0.0.1/stupidtable.min.js"></script>
 {% endblock %}
 {% block body %}
-<h1>Leaderboard</h1>
+<h1>{{ user.name or user.login }}'s Leaderboard</h1>
 
 <table id="leaderboard" class="table table-striped table-hover">
   <thead>
       <tr>
-        <th data-sort="string">User</th>
+        <th data-sort="string">Pull Request</th>
         <th data-sort="float">Ruby Coverage</th>
         <th data-sort="float">JS Coverage</th>
       </tr>
   </thead>
   <tbody>
-    {% for user in leaderboard %}
+    {% for pr, coverage in recorded.items() %}
       <tr
-      href="{{ url_for('user_leaderboard_view', login=user.login) }}"
-      {% if (user.contribution.rb + user.contribution.js) > 0 %}
+      href="https://github.com/localytics/localytics-rails/pull/{{ all_pr[pr].number }}"
+      {% if (coverage.rb + coverage.js) > 0 %}
         class="success"
-      {% elif (user.contribution.rb + user.contribution.js) < 0 %}
+      {% elif (coverage.rb + coverage.js) < 0 %}
         class="danger"
       {% endif %}
       >
-        {% if user.name %}
-        <td>{{ user.name }} ({{ user.login }})</td>
-        {% else %}
-        <td>{{ user.login }}</td>
-        {% endif %}
-        <td>{{ user.contribution.rb }}%</td>
-        <td>{{ user.contribution.js }}%</td>
+        <td>{{ all_pr[pr].title }}%</td>
+        <td>{{ coverage.rb }}%</td>
+        <td>{{ coverage.js }}%</td>
       </tr>
     {% endfor %}
   </tbody>
@@ -40,7 +36,7 @@
 $( document ).ready(function() {
   $("#leaderboard").stupidtable();
   $('.table > tbody > tr').click(function() {
-      window.document.location = $(this).attr("href");
+     window.open($(this).attr("href"));
   });
 });
 </script>

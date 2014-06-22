@@ -31,3 +31,10 @@ class GithubUser():
         if str(r.id) == repo:
           return True
     return False
+
+class PublicGithubUser():
+  def __init__(self, login):
+    self.g = Github()
+    self.user = self.g.get_user(login)
+  def __getattr__(self, key):
+    return getattr(self.user, key)
