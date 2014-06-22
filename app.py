@@ -29,8 +29,9 @@ except:
 
 @app.before_request
 def preprocess_request():
-  if request.endpoint in {'redirect_view', 'proxy_view', 'pending_view'}:
-    session['object_key'] = request.view_args.get('object_key')
+  if request.endpoint in {'redirect_view', 'proxy_view', 'pending_view', 'leaderboard_view', 'user_leaderboard_view'}:
+    if request.view_args.get('object_key'):
+      session['object_key'] = request.view_args.get('object_key')
     if session.get('verified') != True:
       session['next'] = request.url
       return redirect(url_for('login_view'))
@@ -142,21 +143,15 @@ def demo_view():
 
 @app.route('/leaderboard')
 def leaderboard_view():
-  if session.get('token'):
-    return render_template('leaderboard.html', \
-      leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
-  else:    
-    return redirect(url_for('demo_view'))
+  return render_template('leaderboard.html', \
+    leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
 
 @app.route('/leaderboard/user/<login>')
 def user_leaderboard_view(login):
-  if session.get('token'):
-    recorded = storage.get(login).get('recorded')
-    all_pr = {x:bot.repo.get_pull(int(x)) for x in recorded}
-    user = PublicGithubUser(login)
-    return render_template('user_leaderboard.html', recorded=recorded, all_pr=all_pr, user=user)
-  else:    
-    return redirect(url_for('demo_view'))
+  recorded = storage.get(login).get('recorded')
+  all_pr = {x:bot.repo.get_pull(int(x)) for x in recorded}
+  user = PublicGithubUser(login)
+  return render_template('user_leaderboard.html', recorded=recorded, all_pr=all_pr, user=user)
 
 if __name__ == '__main__':
   if dev:
