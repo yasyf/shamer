@@ -1,7 +1,7 @@
 from flask import Flask, redirect, session, request, render_template, url_for, flash, jsonify, send_file, make_response
 from helpers.s3 import S3
 from helpers.constants import Constants
-from helpers.githubuser import GithubUser
+from helpers.githubuser import GithubUser, PublicGithubUser
 from helpers.githubbot import GithubBot
 from helpers.sources.osenv import OSConstants
 from helpers.sources.mongo import MongoConstants
@@ -29,8 +29,9 @@ except:
 
 @app.before_request
 def preprocess_request():
-  if request.endpoint in {'redirect_view', 'proxy_view', 'pending_view'}:
-    session['object_key'] = request.view_args.get('object_key')
+  if request.endpoint in {'redirect_view', 'proxy_view', 'pending_view', 'leaderboard_view', 'user_leaderboard_view'}:
+    if request.view_args.get('object_key'):
+      session['object_key'] = request.view_args.get('object_key')
     if session.get('verified') != True:
       session['next'] = request.url
       return redirect(url_for('login_view'))
@@ -142,11 +143,15 @@ def demo_view():
 
 @app.route('/leaderboard')
 def leaderboard_view():
-  if session.get('token'):
-    return render_template('leaderboard.html', \
-      leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
-  else:    
-    return render_template('demo.html')
+  return render_template('leaderboard.html', \
+    leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
+
+@app.route('/leaderboard/user/<login>')
+def user_leaderboard_view(login):
+  recorded = storage.get(login).get('recorded')
+  all_pr = {x:bot.repo.get_pull(int(x)) for x in recorded}
+  user = PublicGithubUser(login)
+  return render_template('user_leaderboard.html', recorded=recorded, all_pr=all_pr, user=user)
 
 if __name__ == '__main__':
   if dev:

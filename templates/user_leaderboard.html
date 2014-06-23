@@ -1,0 +1,27 @@
+{% extends "_leaderboard.html" %}
+{% block title %}{{ user.name or user.login }}'s Leaderboard{% endblock %}
+{% block heading %}{{ user.name or user.login }}'s Leaderboard{% endblock %}
+{% block th %}
+  <th data-sort="string">Pull Request</th>
+  <th data-sort="float">Ruby Coverage</th>
+  <th data-sort="float">JS Coverage</th>
+{% endblock %}
+{% block tb %}
+  {% for pr, coverage in recorded.items() %}
+    <tr
+    href="https://github.com/localytics/localytics-rails/pull/{{ all_pr[pr].number }}"
+    {% if (coverage.rb + coverage.js) > 0 %}
+      class="success"
+    {% elif (coverage.rb + coverage.js) < 0 %}
+      class="danger"
+    {% endif %}
+    >
+      <td>{{ all_pr[pr].title }}</td>
+      <td>{{ coverage.rb }}%</td>
+      <td>{{ coverage.js }}%</td>
+    </tr>
+  {% endfor %}
+{% endblock %}
+{% block open %}
+window.open($(this).attr("href"));
+{% endblock %}
