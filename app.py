@@ -111,6 +111,8 @@ def callback_view():
   if session.get('object_key'):
     object_key = session.pop('object_key')
     return redirect(url_for('go_view', object_key=object_key))
+  if session.get('next'):
+    return redirect(session.pop('next'))
   return redirect(url_for('demo_view'))
 
 @app.route('/hook/<pull_request_id>/<path:object_key>')
