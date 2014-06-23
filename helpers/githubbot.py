@@ -16,23 +16,24 @@ class GithubBot():
         return comment
 
   def update_leaderboard(self, pull_request_id, args, storage):
-    pr = self.repo.get_pull(pull_request_id)
-    user = storage.get(pr.user.login) or {'name': pr.user.name, 'login': pr.user.login}
-    recorded = user.get('recorded', {})
-    contribution = user.get('contribution', {'rb': 0, 'js': 0})
-    pull_request_id = str(pull_request_id)
-    if pull_request_id in recorded.keys():
-      contribution['rb'] -= recorded[pull_request_id]['rb']
-      contribution['js'] -= recorded[pull_request_id]['js']
-    rb = float(args.get('ruby', 0)) - float(storage.get('master')['ruby'][0])
-    js = float(args.get('js', 0)) - float(storage.get('master')['js'][0])
-    recorded[pull_request_id] = {'rb': rb, 'js': js}
-    contribution['rb'] += rb
-    contribution['js'] += js
-    user['contribution'] = contribution
-    user['recorded'] = recorded
-    user['net_contribution'] = contribution['rb'] + contribution['js']
-    storage.set(pr.user.login, user)
+    if storage.get('master'):
+      pr = self.repo.get_pull(pull_request_id)
+      user = storage.get(pr.user.login) or {'name': pr.user.name, 'login': pr.user.login}
+      recorded = user.get('recorded', {})
+      contribution = user.get('contribution', {'rb': 0, 'js': 0})
+      pull_request_id = str(pull_request_id)
+      if pull_request_id in recorded.keys():
+        contribution['rb'] -= recorded[pull_request_id]['rb']
+        contribution['js'] -= recorded[pull_request_id]['js']
+      rb = float(args.get('ruby', 0)) - float(storage.get('master')['ruby'][0])
+      js = float(args.get('js', 0)) - float(storage.get('master')['js'][0])
+      recorded[pull_request_id] = {'rb': rb, 'js': js}
+      contribution['rb'] += rb
+      contribution['js'] += js
+      user['contribution'] = contribution
+      user['recorded'] = recorded
+      user['net_contribution'] = contribution['rb'] + contribution['js']
+      storage.set(pr.user.login, user)
 
   def comment(self, pull_request_id, message, url, args, storage):
     pr = self.repo.get_pull(pull_request_id)
