@@ -19,8 +19,8 @@
       {% else %}
       <td>{{ user.login }}</td>
       {% endif %}
-      <td>{{ user.contribution.rb }}%</td>
-      <td>{{ user.contribution.js }}%</td>
+      <td>{{ user.contribution.rb|round(2) }}%</td>
+      <td>{{ user.contribution.js|round(2) }}%</td>
     </tr>
   {% endfor %}
 {% endblock %}

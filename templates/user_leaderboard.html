@@ -17,8 +17,8 @@
     {% endif %}
     >
       <td>{{ all_pr[pr].title }}</td>
-      <td>{{ coverage.rb }}%</td>
-      <td>{{ coverage.js }}%</td>
+      <td>{{ coverage.rb|round(2) }}%</td>
+      <td>{{ coverage.js|round(2) }}%</td>
     </tr>
   {% endfor %}
 {% endblock %}
