@@ -1,8 +1,8 @@
 {% extends "_base.html" %}
-{% block title %}Github S3 Auth Demo{% endblock %}
+{% block title %}Coverager Demo{% endblock %}
 {% block body %}
 
-<h1>Github S3 Auth Demo</h1>
+<h1>Coverager Demo</h1>
 
 <p>
   <img src="{{ user.user.avatar_url }}" width='30' height='30' />
@@ -19,10 +19,12 @@
 </p>
 
 <p>
-  <h4>Test Redirect</h4>
-  S3 Object Key: 
-  <input type='text' id='object_key'>
-  <button type='button' id='object_key_btn' class='btn btn-default'>Go!</button>
+  <h4>View Coverage</h4>
+  <p>
+    CI Build Number: 
+    <input type='text' id='ci_build_number'>
+    <button type='button' id='ci_build_number_btn' class='btn btn-default'>Go!</button>
+  </p>
 </p>
 
 {% if user.user.bio %}
@@ -33,10 +35,11 @@
 
 <script>
   $(document).ready(function() {
-    $('#object_key_btn').click(function() {
-      object_key = $('#object_key').val();
-      url = "{{ url_for('redirect_view', object_key='object_key') }}".replace('object_key',object_key);
-      window.location = url;
+    $('#ci_build_number_btn').click(function() {
+      ci_build_number = $('#ci_build_number').val();
+      object_key = "dashboard/ci_build_number/coverage/index.html".replace('ci_build_number', ci_build_number);
+      url = "{{ url_for('go_view', object_key='object_key') }}".replace('object_key', object_key);
+      window.location = url + '?' + encodeURIComponent('CI Build #' + ci_build_number);
     });
   });
 </script>
