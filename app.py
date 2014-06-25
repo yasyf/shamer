@@ -57,10 +57,6 @@ def cached(response_data, since, expires=86400):
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
   return response
 
-@app.route('/')
-def index_view():
-  return redirect(url_for('demo_view'))
-
 @app.route('/redirect/<path:object_key>')
 def redirect_view(object_key):
   url = s3.get_url(object_key, constants.get('EXPIRES'), force_http=constants.get('HTTP') == 'true')
@@ -133,7 +129,7 @@ def hook_view(pull_request_id, object_key):
     return jsonify({'status': 'success'})
   return jsonify({'status': 'no bot credentials'})
 
-@app.route('/demo')
+@app.route('/')
 def demo_view():
   if session.get('token'):
     return render_template('demo_user.html',
