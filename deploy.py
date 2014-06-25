@@ -48,7 +48,7 @@ def check_for_heroku():
   print colored('Checking your Heroku credentials...', 'magenta')
   subprocess.call(['heroku', 'auth:whoami'])
   print
-  print_instruction('Welcome to the github-s3-auth deployer script!')
+  print_instruction('Welcome to the Coverager deployer script!')
 
 def prompt_with_condition(message, condition, error):
   done = False

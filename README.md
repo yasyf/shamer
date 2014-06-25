@@ -1,8 +1,10 @@
-#github-s3-auth
+#Coverager
 
-`github-s3-auth` is a simple micro-service written in Python with the Flask web framework. The one and only goal of this project is to allow access to restricted content hosted/stored on Amazon S3 by authenticating users via GitHub. A user is checked for membership in an organization, and push access to a repository before being allowed to continue on to the files in S3. This server can either act as a cached proxy for files served from your bucket, or redirect to signed, expiring URLs that allow your bucket to serve the files directly. Internally, this service is used by Localytics to proxy code coverage reports stored on S3.
+Coverager is a simple micro-service written in Python with the Flask web framework. The goal of this project is to selectively allow access to code coverage reports hosted on Amazon S3 by authenticating users via GitHub. A user is checked for membership in an organization, and push access to a repository before being allowed to continue on to the coverage reports in S3. This server can either act as a cached proxy for reports served from your bucket, or redirect to signed, expiring URLs that allow your bucket to serve the reports directly. 
 
-As an added bonus, we added a single webhook which can take any arbitrary parameters and use them to construct a comment to be posted on a GitHub pull request. We use this to post a link to relevant code coverage reports on every PR.
+Additionally, Coverager includes a customizable leaderboard that breaks down cumulative code coverage contrinution by user and language, with a drill-down view that shows how each pull request impacted a user's total.
+
+There is a single webhook which can take any arbitrary parameters and use them to construct a comment to be posted on a GitHub pull request. We use this to post a link to relevant code coverage reports on every PR.
 
 The included deploy script, and features such as cache clearing, depend on this code being deployed to [Heroku](https://www.heroku.com/). If you are deploying to AWS or any other cloud provider, you will probably need to alter the code.
 
@@ -13,11 +15,11 @@ Install `pip` if you haven't already.
 ```
 $ sudo easy_install pip
 ```
-Clone and deploy your `github-s3-auth` instance.
+Clone and deploy your Coverager instance.
 
 ```
-$ git clone git@github.com:localytics/github-s3-auth.git
-$ cd github-s3-auth
+$ git clone git@github.com:localytics/coverager.git
+$ cd coverager
 $ sudo pip install requests termcolor
 $ ./deploy.py
 ```
