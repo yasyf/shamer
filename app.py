@@ -123,10 +123,10 @@ def hook_view(pull_request_id, object_key):
       except:
         return jsonify({'status': 'no such pull request'})
     url = url_for('go_view', object_key=object_key, _external=True)
-    message = constants.get('GH_BOT_MESSAGE')
-    bot.update_leaderboard(pull_request_id, request.args, storage)
-    bot.comment(int(pull_request_id), message, url, request.args, storage)
-    return jsonify({'status': 'success'})
+    if bot.process_hook(int(pull_request_id), constants, url, request.args, storage):
+      return jsonify({'status': 'success'})
+    else:
+      return jsonify({'status': 'restarting'})
   return jsonify({'status': 'no bot credentials'})
 
 @app.route('/')
