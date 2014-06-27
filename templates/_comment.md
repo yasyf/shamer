@@ -4,6 +4,7 @@ This is a sample _comment.md template that we use at Localytics. You should cust
 
 {% if (args.ruby|float - storage.get('master').ruby[0]|float < -0.1) or (args.js|float - storage.get('master').js[0]|float < -0.1) %}
 ![Feel Bad](http://i.imgur.com/oXW25lP.jpg)
+(Not right? Try merging master into your branch!)
 {% endif %}
 
 ## Code Coverage

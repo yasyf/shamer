@@ -25,7 +25,7 @@ class GithubBot():
       # Sometimes coverage reports do funky things. This should prevent recording most of them.
       rb = float(args.get('ruby', 0)) - float(storage.get('master')['ruby'][0])
       js = float(args.get('js', 0)) - float(storage.get('master')['js'][0])
-      if rb < -1 or js < -1:
+      if rb <= -1 or js <= -1:
         pr = self.repo.get_pull(pull_request_id)
         user = storage.get(pr.user.login) or {'name': pr.user.name, 'login': pr.user.login}
         if user.get('dangerously_low') != True:
@@ -33,6 +33,9 @@ class GithubBot():
           storage.set(pr.user.login, user)
           url = ci_restart_url.replace('$build_id$', build_id).replace('$api_key$', ci_api_key)
           requests.post(url)
+          body = "Something doesn't look right... I'm re-running the coverage reports." \
+            + "This comment will be updated when I'm done."
+          self.post_comment(body, pr)
           return False
     self.update_leaderboard(pull_request_id, args, storage)
     self.comment(pull_request_id, message, url, args, storage)
@@ -71,6 +74,9 @@ class GithubBot():
       body = render_template('_comment.md', pr=pr, url=url, args=args, storage=storage, rank=rank)
     except TemplateNotFound:
       body = "{}: [{}]({})".format(message, pr.title, url)
+    self.post_comment(body, pr)
+    
+  def post_comment(self, body, pr):
     past_comment = self.past_comment(pr)
     if past_comment:
       past_comment.edit(body)
