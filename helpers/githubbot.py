@@ -32,7 +32,7 @@ class GithubBot():
           user['dangerously_low'] = True
           storage.set(pr.user.login, user)
           url = ci_restart_url.replace('$build_id$', build_id).replace('$api_key$', ci_api_key)
-          requests.get(url)
+          requests.post(url)
           return False
     self.update_leaderboard(pull_request_id, args, storage)
     self.comment(pull_request_id, message, url, args, storage)
