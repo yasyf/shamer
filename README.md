@@ -2,7 +2,7 @@
 
 Coverager is a simple micro-service written in Python with the Flask web framework. The goal of this project is to selectively allow access to code coverage reports hosted on Amazon S3 by authenticating users via GitHub. A user is checked for membership in an organization, and push access to a repository before being allowed to continue on to the coverage reports in S3. This server can either act as a cached proxy for reports served from your bucket, or redirect to signed, expiring URLs that allow your bucket to serve the reports directly. 
 
-Additionally, Coverager includes a customizable leaderboard that breaks down cumulative code coverage contrinution by user and language, with a drill-down view that shows how each pull request impacted a user's total.
+Additionally, Coverager includes a customizable leaderboard that breaks down cumulative code coverage contribution by user and language, with a drill-down view that shows how each pull request impacted a user's total.
 
 There is a single webhook which can take any arbitrary parameters and use them to construct a comment to be posted on a GitHub pull request. We use this to post a link to relevant code coverage reports on every PR.
 
