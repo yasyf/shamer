@@ -1,4 +1,3 @@
-import os
 from pymongo import MongoClient
 
 class MongoConstants():

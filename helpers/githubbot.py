@@ -1,7 +1,6 @@
 from github import Github
 from flask import render_template
 from jinja2 import TemplateNotFound
-from helpers.constants import Constants
 import requests
 
 class GithubBot():
@@ -10,7 +9,7 @@ class GithubBot():
     self.user = self.g.get_user()
     self.org = self.g.get_organization(org)
     self.repo = self.org.get_repo(repo)
-  
+
   def past_comment(self, pr):
     for comment in pr.get_issue_comments():
       if comment.user.id == self.user.id:
@@ -22,12 +21,14 @@ class GithubBot():
     ci_api_key = constants.get('CI_API_KEY')
     build_id = args.get('build_id')
     if build_id:
+      pr = self.repo.get_pull(pull_request_id)
+      base_commit_sha = pr.base.sha
       # Sometimes coverage reports do funky things. This should prevent recording most of them.
-      rb = float(args.get('ruby', 0)) - float(storage.get('master')['ruby'][0])
-      js = float(args.get('js', 0)) - float(storage.get('master')['js'][0])
-      if rb <= -1 or js <= -1:
-        pr = self.repo.get_pull(pull_request_id)
-        user = storage.get(pr.user.login) or {'name': pr.user.name, 'login': pr.user.login}
+      rb = float(args.get('ruby', 0)) - float(storage.get('master').get('ruby').get(base_commit_sha)[0])
+      js = float(args.get('js', 0)) - float(storage.get('master').get('js').get(base_commit_sha)[0])
+      if rb <= -10 or js <= -10:
+        commit = self.repo.get_commit(args.get('commit_id')) or pr.get_commits().reversed[0]
+        user = storage.get(commit.author.login) or {'name': commit.author.name, 'login': commit.author.login}
         if user.get('dangerously_low') != True:
           user['dangerously_low'] = True
           storage.set(pr.user.login, user)
@@ -44,6 +45,7 @@ class GithubBot():
   def update_leaderboard(self, pull_request_id, args, storage):
     if storage.get('master'):
       pr = self.repo.get_pull(pull_request_id)
+      base_commit_sha = pr.base.sha
       user = storage.get(pr.user.login) or {'name': pr.user.name, 'login': pr.user.login}
       recorded = user.get('recorded', {})
       contribution = user.get('contribution', {'rb': 0, 'js': 0})
@@ -51,8 +53,8 @@ class GithubBot():
       if pull_request_id in recorded.keys():
         contribution['rb'] -= recorded[pull_request_id]['rb']
         contribution['js'] -= recorded[pull_request_id]['js']
-      rb = float(args.get('ruby', 0)) - float(storage.get('master')['ruby'][0])
-      js = float(args.get('js', 0)) - float(storage.get('master')['js'][0])
+      rb = float(args.get('ruby', 0)) - float(storage.get('master').get('ruby').get(base_commit_sha)[0])
+      js = float(args.get('js', 0)) - float(storage.get('master').get('js').get(base_commit_sha)[0])
       recorded[pull_request_id] = {'rb': rb, 'js': js}
       contribution['rb'] += rb
       contribution['js'] += js
@@ -75,7 +77,7 @@ class GithubBot():
     except TemplateNotFound:
       body = "{}: [{}]({})".format(message, pr.title, url)
     self.post_comment(body, pr)
-    
+
   def post_comment(self, body, pr):
     past_comment = self.past_comment(pr)
     if past_comment:

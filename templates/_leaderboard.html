@@ -9,8 +9,8 @@
 }
 {% endblock %}
 {% block body %}
-<h1>{% block heading %}Leaderboard{% endblock %}</h1>
-<table id="leaderboard" class="table table-striped table-hover">
+<h1>{% block heading %}{{ org }} Leaderboard{% endblock %}</h1>
+<table id="leaderboard" class="table table-hover">
   <thead>
     <tr>
       {% block th %}{% endblock %}

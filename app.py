@@ -117,7 +117,12 @@ def hook_view(pull_request_id, object_key):
     if not pull_request_id.isdigit():
       # pull_request_id is the branch name
       if storage:
-        storage.set(pull_request_id, request.args)
+        args = request.args.copy()
+        commit = args.pop('commit_id')
+        if commit:
+          value = storage.get(pull_request_id, {})
+          value[commit] = args
+          storage.set(pull_request_id, value)
       try:
         pull_request_id = bot.get_pr_by_branch(pull_request_id).number
       except:
@@ -132,16 +137,14 @@ def hook_view(pull_request_id, object_key):
 @app.route('/')
 def demo_view():
   if session.get('token'):
-    return render_template('demo_user.html',
-      user=GithubUser(token=session.get('token')),
-      v_org=(constants.get('GH_ORG_NAME'), constants.get('GH_ORG')),
-      v_repo=(constants.get('GH_REPO_NAME'), constants.get('GH_REPO')))
-  else:    
-    return render_template('demo.html')
+    return redirect(url_for('leaderboard_view'))
+  else:
+    return redirect(url_for('login_view'))
 
 @app.route('/leaderboard')
 def leaderboard_view():
   return render_template('leaderboard.html', \
+    org=bot.org.name, \
     leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
 
 @app.route('/leaderboard/user/<login>')
