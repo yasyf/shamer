@@ -5,8 +5,8 @@ class Constants():
     # Defaults
     self.defaults = {'EXPIRES': '300', 'GH_SCOPE': 'user,repo,read:org', 'MODE': 'redirect', 'HTTP': 'true'}
 
-  def get(self, key):
-    return self.source.get(key) or self.defaults.get(key)
+  def get(self, key, default=None):
+    return self.source.get(key) or self.defaults.get(key, default)
 
   def set(self, key, value):
     self.source.set(key, value)

@@ -18,14 +18,14 @@ except:
   s3 = None
 
 try:
-  bot = GithubBot(constants.get('GH_ORG_NAME'), constants.get('GH_REPO_NAME'), constants.get('GH_BOT_TOKEN'))
-except:
-  bot = None
-
-try:
   storage = Constants(MongoConstants('constants', constants.get('MONGO_URI')))
 except:
   storage = None
+
+try:
+  bot = GithubBot(constants)
+except:
+  bot = None
 
 @app.before_request
 def preprocess_request():
@@ -117,7 +117,7 @@ def hook_view(pull_request_id, object_key):
     if not pull_request_id.isdigit():
       # pull_request_id is the branch name
       if storage:
-        args = request.args.copy()
+        args = request.args.copy().to_dict()
         commit = args.pop('commit_id')
         if commit:
           value = storage.get(pull_request_id, {})
@@ -128,7 +128,7 @@ def hook_view(pull_request_id, object_key):
       except:
         return jsonify({'status': 'no such pull request'})
     url = url_for('go_view', object_key=object_key, _external=True)
-    if bot.process_hook(int(pull_request_id), constants, url, request.args, storage):
+    if bot.process_hook(int(pull_request_id), url, request.args, storage):
       return jsonify({'status': 'success'})
     else:
       return jsonify({'status': 'restarting'})
@@ -153,6 +153,10 @@ def user_leaderboard_view(login):
   all_pr = {x:bot.repo.get_pull(int(x)) for x in recorded}
   user = PublicGithubUser(login)
   return render_template('user_leaderboard.html', recorded=recorded, all_pr=all_pr, user=user)
+
+@app.template_filter('min')
+def reverse_filter(l):
+    return min(l)
 
 if __name__ == '__main__':
   if dev:

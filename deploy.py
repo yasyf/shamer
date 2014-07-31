@@ -206,7 +206,7 @@ def deploy(params):
   call_without_output(['heroku', 'apps:open', '--app', params['APP_NAME']])
 
   print_instruction('App URL: ' + colored('http://{}.herokuapp.com'.format(params['APP_NAME']), 'cyan'))
-  callback_ex = 'http://{}.herokuapp.com/hook/path/to/coverage/on/S3?build_id=123&commit_id=61aafcdabfad79b2c044b3622c5440ba&js=33.27&ruby=55.99'
+  callback_ex = 'http://{}.herokuapp.com/hook/path/to/coverage/on/S3?build_id=123&commit_id=61aafcdabfad79b2c044b3622c5440ba&js=33.27&rb=55.99'
   print_instruction('Callback Example: GET ' + colored(callback_ex.format(params['APP_NAME']), 'cyan'))
 if __name__ == '__main__':
   DEVNULL = open(os.devnull, 'w')
