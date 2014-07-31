@@ -4,9 +4,13 @@ import subprocess, os, sys, uuid, re, getpass
 try:
   from termcolor import colored
 except ImportError:
-  print '`sudo pip install termcolor` to get this deployer script in color!'
+  print '`sudo pip install termcolor` to get this deploy script in color!'
   def colored(msg, color, **kwargs):
     return msg
+
+def exit_with_error(error):
+  sys.exit(colored(error, 'red'))
+
 try:
   import requests
 except ImportError:
@@ -48,7 +52,7 @@ def check_for_heroku():
   print colored('Checking your Heroku credentials...', 'magenta')
   subprocess.call(['heroku', 'auth:whoami'])
   print
-  print_instruction('Welcome to the Coverager deployer script!')
+  print_instruction('Welcome to the Shamer deployer script!')
 
 def prompt_with_condition(message, condition, error):
   done = False
@@ -71,9 +75,6 @@ def prompt_get_yes_no(prompt):
 
 def print_instruction(instruction):
   print colored(instruction, 'green')
-
-def exit_with_error(error):
-  sys.exit(colored(error, 'red'))
 
 def get_gh_auth():
   GH_USER = prompt_need_response('Your GitHub Username')
@@ -118,7 +119,7 @@ def get_params():
     print_instruction('Use the GitHub API to get your org id')
     open_or_print('https://developer.github.com/v3')
     GH_ORG = prompt_with_condition('GitHub Org Id', lambda x: x.isdigit() ,'Org Id must be an int')
- 
+
   print colored('Trying to fetch your repo id from the GitHub API', 'magenta')
   try:
     repos = get_json('https://api.github.com/orgs/{}/repos'.format(GH_ORG_NAME), auth=get_gh_auth())
@@ -142,7 +143,7 @@ def get_params():
 
   print_instruction('Your instance can redirect to S3 links, or proxy the files directly from S3')
   MODE = prompt_with_condition('Mode [redirect/proxy]', lambda x: x in {'redirect', 'proxy'} ,'Mode must be redirect or proxy')
-  
+
   if prompt_get_yes_no('Would you like a webhook for commenting on pull requests?'):
     print_instruction('Create a new GitHub User to be your bot, and give it permissions for your repo')
     open_or_print('https://github.com/join')
