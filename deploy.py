@@ -86,7 +86,7 @@ def params_default():
 
 def params_dict(_locals):
   params = ['APP_NAME', 'SK', 'MODE', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY', 'GH_ORG', 'GH_REPO', \
-   'GH_ORG_NAME', 'GH_REPO_NAME', 'GH_CLIENT_ID', 'GH_SECRET', 'GH_BOT_TOKEN', 'GH_BOT_MESSAGE']
+   'GH_ORG_NAME', 'GH_REPO_NAME', 'GH_CLIENT_ID', 'GH_SECRET', 'GH_BOT_TOKEN', 'GH_BOT_MESSAGE', 'LANGS']
   d = {param:_locals.get(param) for param in params}
   d.update(params_default())
   return d
@@ -156,6 +156,8 @@ def get_params():
     GH_BOT_TOKEN = None
     GH_BOT_MESSAGE = None
 
+  LANGS = prompt_need_response('Comma-separated list of languages you will be submitting coverage for')
+
   _locals = locals()
   return params_dict(_locals)
 
@@ -204,7 +206,8 @@ def deploy(params):
   call_without_output(['heroku', 'apps:open', '--app', params['APP_NAME']])
 
   print_instruction('App URL: ' + colored('http://{}.herokuapp.com'.format(params['APP_NAME']), 'cyan'))
-
+  callback_ex = 'http://{}.herokuapp.com/hook/path/to/coverage/on/S3?build_id=123&commit_id=61aafcdabfad79b2c044b3622c5440ba&js=33.27&ruby=55.99'
+  print_instruction('Callback Example: GET ' + colored(callback_ex.format(params['APP_NAME']), 'cyan'))
 if __name__ == '__main__':
   DEVNULL = open(os.devnull, 'w')
   try:
