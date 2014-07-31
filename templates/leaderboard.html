@@ -12,26 +12,29 @@
 {% endblock %}
 {% block th %}
   <th data-sort="string">User</th>
-  <th data-sort="float">Ruby Coverage</th>
-  <th data-sort="float">JS Coverage</th>
+  {% for lang in langs %}
+    <th data-sort="float">{{ lang|lang_nice }} Coverage</th>
+  {% endfor %}
 {% endblock %}
 {% block tb %}
   {% for user in leaderboard %}
-    <tr
-    href="{{ url_for('user_leaderboard_view', login=user.login) }}"
-    {% if (user.contribution.rb + user.contribution.js) > 0 %}
+    <tr href="{{ url_for('user_leaderboard_view', login=user.login) }}"
+    {% if user.net_contribution > 0 %}
       class="success"
-    {% elif (user.contribution.rb + user.contribution.js) < 0 %}
+    {% elif user.net_contribution < 0 %}
       class="danger"
     {% endif %}
     >
       {% if user.name %}
-      <td>{{ user.name }} ({{ user.login }})</td>
+      <td>
+        {{ user.name }} ({{ user.login }})
+      </td>
       {% else %}
       <td>{{ user.login }}</td>
       {% endif %}
-      <td>{{ user.contribution.rb|round(2) }}%</td>
-      <td>{{ user.contribution.js|round(2) }}%</td>
+      {% for lang in langs %}
+        <td>{{ user.contribution[lang]|round(2) }}%</td>
+      {% endfor %}
     </tr>
   {% endfor %}
 {% endblock %}

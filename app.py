@@ -145,6 +145,7 @@ def demo_view():
 def leaderboard_view():
   return render_template('leaderboard.html', \
     org=bot.org.name, repo=bot.repo.name, user=GithubUser(token=session.get('token')), \
+    langs=constants.get('LANGS').split(','), \
     leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
 
 @app.route('/leaderboard/user/<login>')
@@ -152,11 +153,20 @@ def user_leaderboard_view(login):
   recorded = storage.get(login).get('recorded')
   all_pr = {x:bot.repo.get_pull(int(x)) for x in recorded}
   user = PublicGithubUser(login)
-  return render_template('user_leaderboard.html', recorded=recorded, all_pr=all_pr, user=user)
+  return render_template('user_leaderboard.html', recorded=recorded, all_pr=all_pr, user=user, repo=bot.repo.name, \
+   langs=constants.get('LANGS').split(','))
 
 @app.template_filter('min')
-def reverse_filter(l):
-    return min(l)
+def min_filter(l):
+  return min(l)
+
+@app.template_filter('sum')
+def sum_filter(l):
+  return sum(l)
+
+@app.template_filter('lang_nice')
+def lang_nice_filter(s):
+  return {'rb': 'Ruby', 'js': 'JavaScript'}.get(s, s)
 
 if __name__ == '__main__':
   if dev:

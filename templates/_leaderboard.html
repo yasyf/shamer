@@ -35,7 +35,7 @@ $( document ).ready(function() {
   $("#leaderboard").stupidtable();
   $('.table > tbody > tr').click(function() {
     {% block open %}
-    window.document.location = $(this).attr("href");
+    window.open($(this).attr("href"));
     {% endblock %}
   });
 });
