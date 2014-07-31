@@ -9,7 +9,16 @@
 }
 {% endblock %}
 {% block body %}
-<h1>{% block heading %}{{ org }} Leaderboard{% endblock %}</h1>
+<h1>{% block heading %}{{ org }} Shamer{% endblock %}</h1>
+<br>
+<p>
+  <img src="{{ user.user.avatar_url }}" width='30' height='30' />
+  {{ user.user.name }} ({{ user.user.email }}) from
+  {{ user.user.company if user.user.company else user.user.location }}
+</p>
+{% block extra %}{% endblock %}
+<hr>
+<h4><code>{{ repo }}</code> Leaderboard</h4>
 <table id="leaderboard" class="table table-hover">
   <thead>
     <tr>
@@ -31,4 +40,5 @@ $( document ).ready(function() {
   });
 });
 </script>
+{% block script %}{% endblock %}
 {% endblock %}

@@ -1,4 +1,15 @@
 {% extends "_leaderboard.html" %}
+{% block extra %}
+<hr>
+<p>
+  <h4>Goto Coverage Report</h4>
+  <p>
+    CI Build Number:
+    <input type='text' id='ci_build_number'>
+    <button type='button' id='ci_build_number_btn' class='btn btn-default'>Go!</button>
+  </p>
+</p>
+{% endblock %}
 {% block th %}
   <th data-sort="string">User</th>
   <th data-sort="float">Ruby Coverage</th>
@@ -23,4 +34,17 @@
       <td>{{ user.contribution.js|round(2) }}%</td>
     </tr>
   {% endfor %}
+{% endblock %}
+
+{% block script %}
+<script>
+  $(document).ready(function() {
+    $('#ci_build_number_btn').click(function() {
+      ci_build_number = $('#ci_build_number').val();
+      object_key = "dashboard/ci_build_number/coverage/index.html".replace('ci_build_number', ci_build_number);
+      url = "{{ url_for('go_view', object_key='object_key') }}".replace('object_key', object_key);
+      window.open(url + '?' + encodeURIComponent('CI Build #' + ci_build_number));
+    });
+  });
+</script>
 {% endblock %}

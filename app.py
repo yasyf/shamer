@@ -144,7 +144,7 @@ def demo_view():
 @app.route('/leaderboard')
 def leaderboard_view():
   return render_template('leaderboard.html', \
-    org=bot.org.name, \
+    org=bot.org.name, repo=bot.repo.name, user=GithubUser(token=session.get('token')), \
     leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
 
 @app.route('/leaderboard/user/<login>')
