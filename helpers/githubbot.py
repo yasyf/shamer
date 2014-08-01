@@ -32,7 +32,7 @@ class GithubBot():
       pr = self.repo.get_pull(pull_request_id)
       base_commit_sha = pr.base.sha
       if base_commit_sha not in storage.get('master'):
-        base_commit_sha = sorted(storage.get('master').items(), key=lambda x: x[1]['build_id'])[0][0]
+        base_commit_sha = sorted(storage.get('master').items(), key=lambda x: x[1]['build_id'])[0][-1]
       # Sometimes coverage reports do funky things. This should prevent recording most of them.
       coverage_diffs = self.do_for_each_language(lambda l: float(args.get(l, 0)) - float(storage.get('master').get(base_commit_sha).get(l)))
       if min(coverage_diffs.values()) < -10:

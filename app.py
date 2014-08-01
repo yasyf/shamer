@@ -122,6 +122,7 @@ def hook_view(pull_request_id, object_key):
         if commit:
           value = storage.get(pull_request_id, {})
           value[commit] = args
+          value['current'] = args
           storage.set(pull_request_id, value)
       try:
         pull_request_id = bot.get_pr_by_branch(pull_request_id).number
