@@ -1,4 +1,4 @@
-from github import Github
+from github import Github, UnknownObjectException
 from flask import render_template
 from jinja2 import TemplateNotFound
 import requests
@@ -57,7 +57,7 @@ class GithubBot():
       user = storage.get(pr.user.login) or {'name': pr.user.name, 'login': pr.user.login}
       recorded = user.get('recorded', {})
       contribution = user.get('contribution', {lang:0 for lang in self.languages})
-      pull_request_id = str(pr.id)
+      pull_request_id = str(pr.number)
       if pull_request_id in recorded.keys():
         for lang in self.languages:
           contribution[lang] -= recorded[pull_request_id][lang]
@@ -95,3 +95,16 @@ class GithubBot():
     for pull in self.repo.get_pulls(state='open'):
       if pull.head.ref == branch_name:
         return pull
+
+  def get_pr_by_id(self, id):
+    for pull in self.repo.get_pulls(state='all'):
+      if pull.id == id:
+        return pull
+
+  def get_pr_by_number_or_id(self, number_or_id):
+    number_or_id = int(number_or_id)
+    try:
+      return self.repo.get_pull(number_or_id)
+    except UnknownObjectException:
+      return self.get_pr_by_id(number_or_id)
+

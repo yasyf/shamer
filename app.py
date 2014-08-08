@@ -152,7 +152,7 @@ def leaderboard_view():
 @app.route('/leaderboard/user/<login>')
 def user_leaderboard_view(login):
   recorded = storage.get(login).get('recorded')
-  all_pr = {x:bot.repo.get_pull(int(x)) for x in recorded}
+  all_pr = {x:bot.get_pr_by_number_or_id(x) for x in recorded}
   user = PublicGithubUser(login)
   return render_template('user_leaderboard.html', recorded=recorded, all_pr=all_pr, user=user, repo=bot.repo.name, \
    langs=constants.get('LANGS').split(','))
