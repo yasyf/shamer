@@ -2,6 +2,7 @@ from github import Github, UnknownObjectException
 from flask import render_template
 from jinja2 import TemplateNotFound
 import requests
+from collections import defaultdict
 
 class GithubBot():
   def __init__(self, constants):
@@ -11,10 +12,15 @@ class GithubBot():
     self.repo = self.org.get_repo(constants.get('GH_REPO_NAME'))
     self.languages = constants.get('LANGS').split(',')
     self.constants = constants
+    self.cache = defaultdict(dict)
 
   def past_comment(self, pr):
+    cached = self.cache['comments'].get(pr.id)
+    if cached:
+      return cached
     for comment in pr.get_issue_comments():
       if comment.user.id == self.user.id:
+        self.cache['comments'][pr.id] = comment
         return comment
 
   def do_for_each_language(self, f):
@@ -92,19 +98,35 @@ class GithubBot():
       pr.create_issue_comment(body)
 
   def get_pr_by_branch(self, branch_name):
+    cached = self.cache['prs'].get(branch_name)
+    if cached:
+      return cached
     for pull in self.repo.get_pulls(state='open'):
       if pull.head.ref == branch_name:
+        self.cache['prs'][branch_name] = pull
         return pull
 
   def get_pr_by_id(self, id):
+    cached = self.cache['prs'].get(id)
+    if cached:
+      return cached
     for pull in self.repo.get_pulls(state='all'):
       if pull.id == id:
+        self.cache['prs'][id] = pull
         return pull
+
+  def get_pr_by_number(self, number):
+    cached = self.cache['prs'].get(number)
+    if cached:
+      return cached
+    pr = self.repo.get_pull(number)
+    self.cache['prs'][number] = pr
+    return pr
 
   def get_pr_by_number_or_id(self, number_or_id):
     number_or_id = int(number_or_id)
     try:
-      return self.repo.get_pull(number_or_id)
+      return self.get_pr_by_number(number_or_id)
     except UnknownObjectException:
       return self.get_pr_by_id(number_or_id)
 
