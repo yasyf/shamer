@@ -33,10 +33,11 @@
 <script>
 $( document ).ready(function() {
   $("#leaderboard").stupidtable();
-  $('.table > tbody > tr').click(function() {
+  $('body').on('mousedown', 'tr[href]', function(e){
     {% block open %}
     window.open($(this).attr("href"));
     {% endblock %}
+    return true;
   });
 });
 </script>
