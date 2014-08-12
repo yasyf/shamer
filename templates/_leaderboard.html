@@ -7,11 +7,14 @@
 .table > tbody > tr {
   cursor: pointer;
 }
+.user-info {
+  font-size: 130%;
+}
 {% endblock %}
 {% block body %}
 <h1>{% block heading %}{{ org }} Shamer{% endblock %}</h1>
 <br>
-<p>
+<p class='user-info'>
   <img src="{{ user.user.avatar_url }}" width='30' height='30' />
   {{ user.user.name or user.user.login }}
   {% if user.user.email %}({{ user.user.email }}){% endif %}
