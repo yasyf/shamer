@@ -13,8 +13,9 @@
 <br>
 <p>
   <img src="{{ user.user.avatar_url }}" width='30' height='30' />
-  {{ user.user.name }} ({{ user.user.email }}) from
-  {{ user.user.company if user.user.company else user.user.location }}
+  {{ user.user.name or user.user.login }}
+  {% if user.user.email %}({{ user.user.email }}){% endif %}
+  {% if user.user.company or user.user.location %}from {{ user.user.company or user.user.location }}{% endif %}
 </p>
 {% block extra %}{% endblock %}
 <hr>
