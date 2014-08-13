@@ -13,7 +13,7 @@ This is a sample _comment.md template that we use at Localytics. You should cust
 
 {% for lang, diff in diffs.items() %}
 
-### {{ lang|lang_nice }}: ![{{ lang|lang_nice }}](https://s3.amazonaws.com/assets.coveralls.io/badges/coveralls_{{ args[lang]|int }}.png)
+### {{ lang|lang_nice }}: ![{{ lang|lang_nice }}](http://img.shields.io/badge/coverage-{{ args[lang]|int }}%25-{{ 'red' if diff < 0 else 'brightgreen' }}.svg?style=flat)
 Current coverage for `{{ pr.head.ref }}` is at **{{ args[lang] }}**%
 **{{ diff }}**% change from <a href='https://github.com/{{ pr.head.repo.organization.login }}/{{ pr.head.repo.name }}/tree/{{ base }}'>`master`</a> at {{ base }}
 
