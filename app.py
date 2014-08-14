@@ -17,15 +17,22 @@ try:
 except:
   s3 = None
 
-try:
-  storage = Constants(MongoConstants('constants', constants.get('MONGO_URI')))
-except:
-  storage = None
+collections = zip(constants.get('GH_REPOS'), constants.get('STORAGE_COLLECTIONS'))
+storages = {}
+for repo_name, collection_name in collections:
+  try:
+    storage = Constants(MongoConstants(collection_name, constants.get('MONGO_URI')))
+  except:
+    storage = None
+  storages[repo_name] = storage
 
-try:
-  bot = GithubBot(constants)
-except:
-  bot = None
+bots ={}
+for repo_name in constants.get('GH_REPOS').split(','):
+  try:
+    bot = GithubBot(constants, repo_name)
+  except:
+    bot = None
+  bots[repo_name] = bot
 
 @app.before_request
 def preprocess_request():
@@ -113,6 +120,11 @@ def callback_view():
 
 @app.route('/hook/<pull_request_id>/<path:object_key>')
 def hook_view(pull_request_id, object_key):
+  repo_name = request.args.get('repo_name')
+  if not repo_name:
+    return jsonify({'status': 'no repo name'})
+  bot = bots.get(repo_name)
+  storage = storages.get(repo_name)
   if bot:
     if not pull_request_id.isdigit():
       # pull_request_id is the branch name
