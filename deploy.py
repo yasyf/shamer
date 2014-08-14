@@ -85,8 +85,8 @@ def params_default():
   return {'WEB_CONCURRENCY': 5}
 
 def params_dict(_locals):
-  params = ['APP_NAME', 'SK', 'MODE', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY', 'GH_ORG', 'GH_REPO', \
-   'GH_ORG_NAME', 'GH_REPO_NAME', 'GH_CLIENT_ID', 'GH_SECRET', 'GH_BOT_TOKEN', 'GH_BOT_MESSAGE', 'LANGS']
+  params = ['APP_NAME', 'SK', 'MODE', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY', 'GH_ORG', 'GH_REPOS', \
+   'GH_ORG_NAME', 'STORAGE_COLLECTIONS', 'GH_CLIENT_ID', 'GH_SECRET', 'GH_BOT_TOKEN', 'GH_BOT_MESSAGE', 'LANGS']
   d = {param:_locals.get(param) for param in params}
   d.update(params_default())
   return d
@@ -105,10 +105,10 @@ def get_params():
 
   AWS_BUCKET = prompt_need_response('S3 Bucket Name')
   AWS_ACCESS_KEY = prompt_with_length('AWS Access Key', 20)
-  AWS_SECRET_KEY = prompt_with_length('AWD Secret Key', 40)
+  AWS_SECRET_KEY = prompt_with_length('AWS Secret Key', 40)
 
   GH_ORG_NAME = prompt_need_response('Name of GitHub Org to Validate (Case-Sensitive)')
-  GH_REPO_NAME = prompt_need_response('Name of GitHub Repo to Validate (Case-Sensitive)')
+  GH_REPOS = prompt_need_response('Name of GitHub Repo to Validate (Case-Sensitive)')
 
   print colored('Trying to fetch your org id from the GitHub API', 'magenta')
   try:
@@ -119,19 +119,6 @@ def get_params():
     print_instruction('Use the GitHub API to get your org id')
     open_or_print('https://developer.github.com/v3')
     GH_ORG = prompt_with_condition('GitHub Org Id', lambda x: x.isdigit() ,'Org Id must be an int')
-
-  print colored('Trying to fetch your repo id from the GitHub API', 'magenta')
-  try:
-    repos = get_json('https://api.github.com/orgs/{}/repos'.format(GH_ORG_NAME), auth=get_gh_auth())
-    for repo in repos:
-      if repo['name'] == GH_REPO_NAME:
-        GH_REPO = repo['id']
-    print colored('Found an repo with id of {}!'.format(GH_REPO), 'grey')
-  except:
-    print colored('Could not automatically find that GitHub Repo!', 'red')
-    print_instruction('Use the GitHub API to get your org id')
-    open_or_print('https://developer.github.com/v3')
-    GH_REPO = prompt_with_condition('GitHub Repo Id', lambda x: x.isdigit() ,'Repo Id must be an int')
 
   print_instruction('You must now create a new GitHub App to authenticate users')
   open_or_print('https://github.com/organizations/{}/settings/applications/new'.format(GH_ORG_NAME))
