@@ -12,6 +12,8 @@ dev = os.environ.get('dev') == 'true' or not os.environ.get('PORT')
 constants = Constants(OSConstants())
 app.secret_key = constants.get('SK')
 
+LANGS = dict(zip(constants.get('GH_REPOS').split(','), constants.get('LANGS').split(';')))
+
 try:
   s3 = S3(constants.get('AWS_ACCESS_KEY'), constants.get('AWS_SECRET_KEY'), constants.get('AWS_BUCKET'))
 except:
@@ -29,7 +31,7 @@ for repo_name, collection_name in collections:
 bots ={}
 for repo_name in constants.get('GH_REPOS').split(','):
   try:
-    bot = GithubBot(constants, repo_name)
+    bot = GithubBot(constants, repo_name, LANGS[repo_name])
   except:
     bot = None
   bots[repo_name] = bot
@@ -158,7 +160,7 @@ def demo_view():
 def leaderboard_view():
   leaderboards = {r:s.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)) for r,s in storages.iteritems()}
   return render_template('leaderboard.html', \
-    org=constants.get('GH_ORG_NAME'), user=GithubUser(token=session.get('token')), langs=constants.get('LANGS').split(','), \
+    org=constants.get('GH_ORG_NAME'), user=GithubUser(token=session.get('token')), all_langs=LANGS, \
     leaderboards=leaderboards)
 
 @app.route('/leaderboard/user/<login>')
@@ -173,7 +175,7 @@ def user_leaderboard_view(login):
     except AttributeError:
       continue
   user = PublicGithubUser(login)
-  return render_template('user_leaderboard.html', leaderboards=leaderboards, user=user, langs=constants.get('LANGS').split(','))
+  return render_template('user_leaderboard.html', leaderboards=leaderboards, user=user, all_langs=LANGS)
 
 @app.template_filter('min')
 def min_filter(l):

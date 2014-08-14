@@ -22,6 +22,7 @@
 </p>
 {% block extra %}{% endblock %}
 {% for repo, leaderboard in leaderboards.iteritems() if leaderboard %}
+{% set langs = all_langs[repo].split(',') %}
   <hr>
   <h4><code>{{ repo }}</code> Leaderboard</h4>
   <table id="leaderboard" class="table table-hover">

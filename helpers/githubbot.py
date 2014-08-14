@@ -5,12 +5,12 @@ import requests
 from collections import defaultdict
 
 class GithubBot():
-  def __init__(self, constants, repo_name):
+  def __init__(self, constants, repo_name, langs):
     self.g = Github(constants.get('GH_BOT_TOKEN'))
     self.user = self.g.get_user()
     self.org = self.g.get_organization(constants.get('GH_ORG_NAME'))
     self.repo = self.org.get_repo(repo_name)
-    self.languages = constants.get('LANGS').split(',')
+    self.languages = langs.split(',')
     self.constants = constants
     self.cache = defaultdict(dict)
 
