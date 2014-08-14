@@ -17,7 +17,7 @@ try:
 except:
   s3 = None
 
-collections = zip(constants.get('GH_REPOS'), constants.get('STORAGE_COLLECTIONS'))
+collections = zip(constants.get('GH_REPOS').split(','), constants.get('STORAGE_COLLECTIONS').split(','))
 storages = {}
 for repo_name, collection_name in collections:
   try:
@@ -102,7 +102,7 @@ def callback_view():
     user = GithubUser(code=code, client_id=constants.get('GH_CLIENT_ID'), secret=constants.get('GH_SECRET'))
     if user.is_valid():
       session['token'] = user.token
-      if user.verify_org(constants.get('GH_ORG')) and user.verify_repo(constants.get('GH_REPO')):
+      if user.verify_org(constants.get('GH_ORG')) and any(user.verify_repo(b.repo.id) for b in bots.values()):
         flash('You are now logged in!', 'success')
         session['verified'] = True
       else:
@@ -156,18 +156,24 @@ def demo_view():
 
 @app.route('/leaderboard')
 def leaderboard_view():
+  leaderboards = {r:s.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)) for r,s in storages.iteritems()}
   return render_template('leaderboard.html', \
-    org=bot.org.name, repo=bot.repo.name, user=GithubUser(token=session.get('token')), \
-    langs=constants.get('LANGS').split(','), \
-    leaderboard=storage.all({'value.contribution':{'$exists': True}}, ('value.net_contribution', -1)))
+    org=constants.get('GH_ORG_NAME'), user=GithubUser(token=session.get('token')), langs=constants.get('LANGS').split(','), \
+    leaderboards=leaderboards)
 
 @app.route('/leaderboard/user/<login>')
 def user_leaderboard_view(login):
-  recorded = storage.get(login).get('recorded')
-  all_pr = {x:bot.get_pr_by_number_or_id(x) for x in recorded}
+  leaderboards = {}
+  for repo, storage in storages.iteritems():
+    bot = bots.get(repo)
+    try:
+      recorded = storage.get(login).get('recorded')
+      all_pr = {x:bot.get_pr_by_number_or_id(x) for x in recorded}
+      leaderboards[repo] = {'recorded': recorded, 'all_pr': all_pr}
+    except AttributeError:
+      continue
   user = PublicGithubUser(login)
-  return render_template('user_leaderboard.html', recorded=recorded, all_pr=all_pr, user=user, repo=bot.repo.name, \
-   langs=constants.get('LANGS').split(','))
+  return render_template('user_leaderboard.html', leaderboards=leaderboards, user=user, langs=constants.get('LANGS').split(','))
 
 @app.template_filter('min')
 def min_filter(l):

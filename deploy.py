@@ -86,7 +86,7 @@ def params_default():
 
 def params_dict(_locals):
   params = ['APP_NAME', 'SK', 'MODE', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY', 'GH_ORG', 'GH_REPOS', \
-   'GH_ORG_NAME', 'STORAGE_COLLECTIONS', 'GH_CLIENT_ID', 'GH_SECRET', 'GH_BOT_TOKEN', 'GH_BOT_MESSAGE', 'LANGS']
+   'GH_ORG_NAME', 'STORAGE_COLLECTIONS', 'GH_CLIENT_ID', 'GH_SECRET', 'GH_BOT_TOKEN', 'GH_BOT_MESSAGE', 'LANGS', 'MONGO_URI']
   d = {param:_locals.get(param) for param in params}
   d.update(params_default())
   return d
@@ -127,6 +127,9 @@ def get_params():
 
   GH_CLIENT_ID = prompt_with_length('GitHub Client Id', 20)
   GH_SECRET = prompt_with_length('GitHub Client Secret', 40)
+
+  MONGO_URI = prompt_need_response('MongoDB URI')
+  STORAGE_COLLECTIONS = prompt_need_response('MongoDB collection name')
 
   print_instruction('Your instance can redirect to S3 links, or proxy the files directly from S3')
   MODE = prompt_with_condition('Mode [redirect/proxy]', lambda x: x in {'redirect', 'proxy'} ,'Mode must be redirect or proxy')

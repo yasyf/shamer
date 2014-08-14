@@ -8,16 +8,16 @@
   {% endfor %}
 {% endblock %}
 {% block tb %}
-  {% for pr, coverage in recorded.items() %}
+  {% for pr, coverage in leaderboard.recorded.items() %}
     <tr
-    href="https://github.com/localytics/localytics-rails/pull/{{ all_pr[pr].number }}"
+    href="https://github.com/localytics/localytics-rails/pull/{{ leaderboard.all_pr[pr].number }}"
     {% if (coverage.rb + coverage.js) > 0 %}
       class="success"
     {% elif coverage.values()|sum < 0 %}
       class="danger"
     {% endif %}
     >
-      <td>{{ all_pr[pr].title }}</td>
+      <td>{{ leaderboard.all_pr[pr].title }}</td>
       {% for lang in langs %}
         <td>{{ coverage[lang]|round(2) }}%</td>
       {% endfor %}

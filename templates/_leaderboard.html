@@ -21,18 +21,20 @@
   {% if user.user.company or user.user.location %}from {{ user.user.company or user.user.location }}{% endif %}
 </p>
 {% block extra %}{% endblock %}
-<hr>
-<h4><code>{{ repo }}</code> Leaderboard</h4>
-<table id="leaderboard" class="table table-hover">
-  <thead>
-    <tr>
-      {% block th %}{% endblock %}
-    </tr>
-  </thead>
-  <tbody>
-    {% block tb %}{% endblock %}
-  </tbody>
-</table>
+{% for repo, leaderboard in leaderboards.iteritems() if leaderboard %}
+  <hr>
+  <h4><code>{{ repo }}</code> Leaderboard</h4>
+  <table id="leaderboard" class="table table-hover">
+    <thead>
+      <tr>
+        {% block th scoped %}{% endblock %}
+      </tr>
+    </thead>
+    <tbody>
+      {% block tb scoped %}{% endblock %}
+    </tbody>
+  </table>
+{% endfor %}
 
 <script>
 $( document ).ready(function() {
