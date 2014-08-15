@@ -21,5 +21,5 @@ Current coverage for `{{ pr.head.ref }}` is at **{{ args[lang] }}**%
 {% endfor %}
 
 {% if rank %}
-Your rank on the [Localytics Coverage Leaderboard]({{ url_for('leaderboard_view', _external=True) }}) is **{{ rank[0] }}** out of **{{ rank[1] }}**!
+Your rank on the [Localytics Coverage Leaderboard]({{ url_for('leaderboard_view', _external=True) }}) for `{{ pr.head.repo.name }}` is **{{ rank[0] }}** out of **{{ rank[1] }}**!
 {% endif %}
