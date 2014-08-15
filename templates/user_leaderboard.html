@@ -10,8 +10,8 @@
 {% block tb %}
   {% for pr, coverage in leaderboard.recorded.items() %}
     <tr
-    href="https://github.com/localytics/localytics-rails/pull/{{ leaderboard.all_pr[pr].number }}"
-    {% if (coverage.rb + coverage.js) > 0 %}
+    href="https://github.com/{{ org }}/{{ repo }}/pull/{{ leaderboard.all_pr[pr].number }}"
+    {% if coverage.values()|sum > 0 %}
       class="success"
     {% elif coverage.values()|sum < 0 %}
       class="danger"

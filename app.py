@@ -175,7 +175,7 @@ def user_leaderboard_view(login):
     except AttributeError:
       continue
   user = PublicGithubUser(login)
-  return render_template('user_leaderboard.html', leaderboards=leaderboards, user=user, all_langs=LANGS)
+  return render_template('user_leaderboard.html', leaderboards=leaderboards, user=user, all_langs=LANGS, org=constants.get('GH_ORG_NAME'),)
 
 @app.template_filter('min')
 def min_filter(l):
