@@ -1,12 +1,16 @@
 #Shamer
 
-Shamer is a simple micro-service written in Python with the Flask web framework. The goal of this project is to selectively allow access to code coverage reports hosted on Amazon S3 by authenticating users via GitHub. A user is checked for membership in an organization, and push access to a repository before being allowed to continue on to the coverage reports in S3. This server can either act as a cached proxy for reports served from your bucket, or redirect to signed, expiring URLs that allow your bucket to serve the reports directly.
+Shamer is a simple micro-service with the goal of making it dead simple to gamify code coverage. Testing is a huge part of our culture at Localytics, and Shamer is the result of our efforts to encourage everyone to write the most thorough tests possible. 
 
-Additionally, Shamer includes a customizable leaderboard that breaks down cumulative code coverage contribution by user and language, with a drill-down view that shows how each pull request impacted a user's total.
+Shamer allows you to generate coverage reports (we do this after every successful build), host them in a central location, and automatically comment on Pull Requests with a link to the hosted reports. The rest of that comment is where things get interesting. By allowing you to send coverage data to a single endpoint, Shamer keeps track of aggregate deltas on a per-user and per-commit basis, building a multi-repo leaderboard of each person's contributions over time. Every comment lets the owner of the PR know what their rank is on the leaderboard, and how their code is changing coverage project-wide.
 
-There is a single webhook which can take any arbitrary parameters and use them to construct a comment to be posted on a GitHub pull request. We use this to post a link to relevant code coverage reports on every PR.
+Shamer's guts are an app written in Python with the Flask web framework. It selectively allows access to code coverage reports hosted on Amazon S3 by authenticating users via GitHub. A user is checked for membership in an organization, and push access to a repository before being allowed to continue on to the coverage reports in S3. This server can either act as a cached proxy for reports served from your bucket, or redirect to signed, expiring URLs that allow your bucket to serve the reports directly.
 
-The included deploy script, and features such as cache clearing, depend on this code being deployed to [Heroku](https://www.heroku.com/). If you are deploying to AWS or any other cloud provider, you will probably need to alter the code.
+Additionally, Shamer includes templates for a customizable leaderboard that breaks down cumulative code coverage contribution by user and language, with a drill-down view that shows how each pull request impacted a user's total.
+
+There is a single webhook which can take any arbitrary parameters and use them to construct a comment to be posted on a GitHub pull request. Your only external responsibility in setting up Shamer is to notify this hook whenever reports are generated, sending along some relevant metadata about the commit.
+
+The included deploy script depend on this code being deployed to [Heroku](https://www.heroku.com/). If you are deploying to AWS or any other cloud provider, you will probably need to alter the code.
 
 ##Deploy Instructions
 
