@@ -104,7 +104,7 @@ def callback_view():
     user = GithubUser(code=code, client_id=constants.get('GH_CLIENT_ID'), secret=constants.get('GH_SECRET'))
     if user.is_valid():
       session['token'] = user.token
-      if user.verify_org(constants.get('GH_ORG')) and any(user.verify_repo(b.repo.id) for b in bots.values()):
+      if user.verify_org(constants.get('GH_ORG')) and any([user.verify_repo(str(b.repo.id)) for b in bots.values()]):
         flash('You are now logged in!', 'success')
         session['verified'] = True
       else:
