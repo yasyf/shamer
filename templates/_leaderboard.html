@@ -12,7 +12,7 @@
 }
 {% endblock %}
 {% block body %}
-<h1>{% block heading %}{{ org }} Shamer{% endblock %}</h1>
+<h1>{% block heading %}{{ org|title }} Shamer{% endblock %}</h1>
 <br>
 <p class='user-info'>
   <img src="{{ user.user.avatar_url }}" width='30' height='30' />
