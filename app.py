@@ -97,6 +97,12 @@ def login_view():
     session['state'])
   return redirect('https://github.com/login/oauth/authorize?{}'.format(query))
 
+@app.route('/access_denied')
+def no_auth_view():
+  org_verified = session.get('org_verified', False)
+  repo_verified = session.get('repo_verified', False)
+  return render_template('no_auth.html', org_verified=org_verified, repo_verified=repo_verified, org=constants.get('GH_ORG_NAME'), repos=[b.repo.name for b in bots.values()])
+
 @app.route('/callback')
 def callback_view():
   if request.args.get('state') == session.get('state'):
@@ -104,12 +110,17 @@ def callback_view():
     user = GithubUser(code=code, client_id=constants.get('GH_CLIENT_ID'), secret=constants.get('GH_SECRET'))
     if user.is_valid():
       session['token'] = user.token
-      if user.verify_org(constants.get('GH_ORG')) and any([user.verify_repo(str(b.repo.id)) for b in bots.values()]):
+      org_verified = user.verify_org(constants.get('GH_ORG'))
+      repo_verified = any([user.verify_repo(str(b.repo.id)) for b in bots.values()])
+      if org_verified and repo_verified:
         flash('You are now logged in!', 'success')
         session['verified'] = True
       else:
         flash('You do not satisfy the authentication requirements!', 'danger')
         session['verified'] = False
+        session['org_verified'] = org_verified
+        session['repo_verified'] = repo_verified
+        return redirect(url_for('no_auth_view'))
     else:
       flash('Your GitHub credentials are not valid!', 'danger')
       session['verified'] = False

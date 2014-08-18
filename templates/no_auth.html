@@ -1,0 +1,21 @@
+{% extends "_base.html" %}
+{% block title %}Login Failed{% endblock %}
+{% block body %}
+
+<h1>Login Failed</h1>
+
+<p>
+  Your GitHub account does not satisfy the requirements to access this leaderboard.
+</p>
+{% if not org_verified %}
+<p>
+  You must be a part of the <code>{{ org }}</code> org.
+</p>
+{% endif %}
+{% if not repo_verified %}
+<p>
+  You must have push permissions to one of the following repos: <code>{{ repos|join('</code>, <code>') }}</code>.
+</p>
+{% endif %}
+
+{% endblock %}
