@@ -85,7 +85,7 @@ def params_default():
   return {'WEB_CONCURRENCY': 5}
 
 def params_dict(_locals):
-  params = ['APP_NAME', 'SK', 'MODE', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY', 'GH_ORG', 'GH_REPOS', \
+  params = ['APP_NAME', 'SK', 'MODE', 'AWS_BUCKET', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY', 'GH_ORG', 'GH_REPOS', 'CURRENT', \
    'GH_ORG_NAME', 'STORAGE_COLLECTIONS', 'GH_CLIENT_ID', 'GH_SECRET', 'GH_BOT_TOKEN', 'GH_BOT_MESSAGE', 'LANGS', 'MONGO_URI']
   d = {param:_locals.get(param) for param in params}
   d.update(params_default())
@@ -147,6 +147,9 @@ def get_params():
     GH_BOT_MESSAGE = None
 
   LANGS = prompt_need_response('Comma-separated list of languages you will be submitting coverage for')
+  lang_length = len(LANGS.split(','))
+  CURRENT = prompt_with_condition('Comma-separated list of the current code coverage percentages for each language', \
+   lambda x: len(x.split(',')) == lang_length, 'Enter one coverage percentage per language')
 
   _locals = locals()
   return params_dict(_locals)

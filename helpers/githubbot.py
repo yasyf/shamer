@@ -37,6 +37,10 @@ class GithubBot():
     if build_id:
       pr = self.repo.get_pull(pull_request_id)
       base_commit_sha = pr.base.sha
+      if not storage.get('master'):
+        default = zip(self.languages, self.constants.get('CURRENT').split(','))
+        default.update({'repo_name': self.repo.name, 'build_id': '1'})
+        storage.set('master', default)
       if base_commit_sha not in storage.get('master'):
         base_commit_sha = sorted(storage.get('master').items(), key=lambda x: x[1]['build_id'])[0][-1]
       # Sometimes coverage reports do funky things. This should prevent recording most of them.
