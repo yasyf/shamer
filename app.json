@@ -1,0 +1,83 @@
+{
+  "name": "Shamer",
+  "description": "Shamer is a simple micro-service with the goal of making it dead simple to gamify code coverage.",
+  "keywords": [
+    "Localytics",
+    "code coverage"
+  ],
+  "repository": "https://github.com/localytics/shamer/",
+  "success_url": "/",
+  "addons": [
+    "mongolab:sandbox"
+  ],
+  "scripts": {
+    "postdeploy": "python bin/postdeploy.py"
+  },
+  "env": {
+    "AWS_ACCESS_KEY": {
+      "description": "Amazon AWS Access Key"
+    },
+    "AWS_SECRET_KEY": {
+      "description": "Amazon AWS Secret Key"
+    },
+    "AWS_BUCKET": {
+      "description": "Amazon S3 Bucket Name"
+    },
+    "GH_BOT_MESSAGE": {
+      "description": "Github comment bot's default message",
+      "value": "Code coverage reports have been generated",
+      "required": false
+    },
+    "GH_ORG": {
+      "description": "Github Org ID (from the Github API)"
+    },
+    "GH_ORG_NAME": {
+      "description": "Github Org Name"
+    },
+    "GH_CLIENT_ID": {
+      "description": "Github API Client ID"
+    },
+    "GH_SECRET": {
+      "description": "Github API Client Secret"
+    },
+    "GH_BOT_TOKEN": {
+      "description": "Github API Personal Access Token"
+    },
+    "GH_REPOS": {
+      "description": "Comma-separated Github repo names to track coverage for"
+    },
+    "LANGS": {
+      "description": "Comma-separated language codes to collect coverage for (semicolon-separated for multiple repos)"
+    },
+    "STORAGE_COLLECTIONS": {
+      "description": "Comma-separated names of Mongo collections to store repo coverage data in",
+      "value": "coverage"
+    },
+    "CI_API_KEY": {
+      "description": "API Key for CI service",
+      "required": false
+    },
+    "CI_RESTART_URL": {
+      "description": "Restart endpoint for CI service ($build_id$ and $api_key$ will be substituted)",
+      "required": false
+    },
+    "SK": {
+      "description": "Flask app secret key",
+      "generator": "secret"
+    },
+    "MODE": {
+      "description": "S3 file transfer mode (proxy or redirect)",
+      "value": "proxy"
+    },
+    "WEB_CONCURRENCY": {
+      "description": "Number of gunicorn workers to run",
+      "value": "3",
+      "required": false
+    },
+    "dev": {
+      "description": "Development mode flag",
+      "value": "false",
+      "required": false
+    }
+  }
+}
