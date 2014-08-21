@@ -14,6 +14,10 @@ The included deploy script depend on this code being deployed to [Heroku](https:
 
 ##Deploy Instructions
 
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/localytics/shamer/)
+
+###Manual Deploy
+
 Install `pip` if you haven't already.
 
 ```
