@@ -44,7 +44,7 @@
       "description": "Comma-separated Github repo names to track coverage for"
     },
     "LANGS": {
-      "description": "Comma-separated language codes to collect coverage for (semicolon-separated for multiple repos, one per repo)"
+      "description": "Comma-separated language file extensions (such as rb,js) to collect coverage for (semicolon-separated for multiple repos, one per repo)"
     },
     "STORAGE_COLLECTIONS": {
       "description": "Comma-separated names of Mongo collections to store repo coverage data in (one per repo)",

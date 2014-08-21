@@ -38,6 +38,24 @@ To reuse your config from the last deploy, edit `.env` as needed, then run the d
 ```
 $ foreman run ./deploy.py
 ```
+
+##Usage
+
+Once you have a Shamer instance up and running, it is very easy to integrate the leaderboard into your project. In setting up Shamer, you only have one responsibiliy: generate code coverage and pass the numbers to a webhook. How you do this will vary by project and language. At Localytics, we generate coverage after every CI build.
+
+To submit your coverage percentages to Shamer, make a GET request to the `/hook/<pull_request_id>/<path:object_key>` endpoint. The `pull_request_id` is either the number of the PR, or the name of the branch for that PR. The `object_key` is the path to the coverage report on your S3 bucket. You must also include the following query parameters.
+
+- `build_id`: A unique identifier, often provided by your CI system
+- `commit_id`: The commit hash that these coverage percentages are for
+
+The final query parameters are the percentages of coverage for each language, identified by the comma-separated file extensions you entered during setup.
+
+Here is an example request for a project that has both Ruby and JavaScript code, where `123` is the `pull_request_id`, and `xyz/coverage/index.html` is the `object_key`.
+
+```
+GET http://shamer.herokuapp.com/hook/123/xyz/coverage/index.html?build_id=1861574&commit_id=9a98f3bb8dbe23e60f1c1bfb2191a242910b2ea1&js=33.66&rb=57.68
+```
+
 ##Customization
 
 The jinja2 template at `templates/_comment.md` is how the service generates GitHub comments. We have included a sample that we use for adding code coverage notifiations to pull requests, but you can change this to suit your needs.

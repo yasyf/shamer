@@ -146,7 +146,7 @@ def get_params():
     GH_BOT_TOKEN = None
     GH_BOT_MESSAGE = None
 
-  LANGS = prompt_need_response('Comma-separated list of languages you will be submitting coverage for')
+  LANGS = prompt_need_response('Comma-separated language file extensions (such as rb,js) to collect coverage for')
   lang_length = len(LANGS.split(','))
   CURRENT = prompt_with_condition('Comma-separated list of the current code coverage percentages for each language', \
    lambda x: len(x.split(',')) == lang_length, 'Enter one coverage percentage per language')
