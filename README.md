@@ -16,6 +16,8 @@ The included deploy script depend on this code being deployed to [Heroku](https:
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/localytics/shamer/)
 
+Click the above button to deploy a Shamer instance to Heroku.
+
 ###Manual Deploy
 
 Install `pip` if you haven't already.

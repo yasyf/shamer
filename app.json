@@ -10,9 +10,6 @@
   "addons": [
     "mongolab:sandbox"
   ],
-  "scripts": {
-    "postdeploy": "python bin/postdeploy.py"
-  },
   "env": {
     "AWS_ACCESS_KEY": {
       "description": "Amazon AWS Access Key"
@@ -69,15 +66,7 @@
       "description": "S3 file transfer mode (proxy or redirect)",
       "value": "proxy"
     },
-    "WEB_CONCURRENCY": {
-      "description": "Number of gunicorn workers to run",
-      "value": "3",
-      "required": false
-    },
-    "dev": {
-      "description": "Development mode flag",
-      "value": "false",
-      "required": false
-    }
+    "WEB_CONCURRENCY": "3",
+    "dev": "false"
   }
 }
