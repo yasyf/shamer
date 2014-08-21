@@ -51,7 +51,7 @@
       "value": "coverage"
     },
     "CURRENT": {
-      "description": "Comma-separated values of current code coverage percentages (one per repo)",
+      "description": "Comma-separated values of current code coverage percentages (one per repo)"
     },
     "CI_API_KEY": {
       "description": "API Key for CI service [optional]",
