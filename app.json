@@ -44,18 +44,21 @@
       "description": "Comma-separated Github repo names to track coverage for"
     },
     "LANGS": {
-      "description": "Comma-separated language codes to collect coverage for (semicolon-separated for multiple repos)"
+      "description": "Comma-separated language codes to collect coverage for (semicolon-separated for multiple repos, one per repo)"
     },
     "STORAGE_COLLECTIONS": {
-      "description": "Comma-separated names of Mongo collections to store repo coverage data in",
+      "description": "Comma-separated names of Mongo collections to store repo coverage data in (one per repo)",
       "value": "coverage"
     },
+    "CURRENT": {
+      "description": "Comma-separated values of current code coverage percentages (one per repo)",
+    },
     "CI_API_KEY": {
-      "description": "API Key for CI service",
+      "description": "API Key for CI service [optional]",
       "required": false
     },
     "CI_RESTART_URL": {
-      "description": "Restart endpoint for CI service ($build_id$ and $api_key$ will be substituted)",
+      "description": "Restart endpoint for CI service ($build_id$ and $api_key$ will be substituted) [optional]",
       "required": false
     },
     "SK": {
@@ -66,7 +69,15 @@
       "description": "S3 file transfer mode (proxy or redirect)",
       "value": "proxy"
     },
-    "WEB_CONCURRENCY": "3",
-    "dev": "false"
+   "WEB_CONCURRENCY": {
+     "description": "Number of gunicorn workers to run",
+     "value": "3",
+     "required": false
+   },
+   "dev": {
+     "description": "Development mode flag",
+     "value": "false",
+     "required": false
+   }
   }
 }
