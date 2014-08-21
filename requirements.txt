@@ -2,6 +2,7 @@ Flask==0.10.1
 Jinja2==2.7.3
 MarkupSafe==0.23
 PyGithub==1.25.0
+PyYAML==3.11
 Werkzeug==0.9.6
 boto==2.29.1
 gunicorn==19.0.0

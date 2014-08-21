@@ -5,12 +5,15 @@ from helpers.githubuser import GithubUser, PublicGithubUser
 from helpers.githubbot import GithubBot
 from helpers.sources.osenv import OSConstants
 from helpers.sources.mongo import MongoConstants
+from helpers.extensions import LanguageExtensions
 import os, time, datetime
 
 app = Flask(__name__)
 dev = os.environ.get('dev') == 'true' or not os.environ.get('PORT')
 constants = Constants(OSConstants())
 app.secret_key = constants.get('SK')
+
+extensions = LanguageExtensions()
 
 LANGS = dict(zip(constants.get('GH_REPOS').split(','), constants.get('LANGS').split(';')))
 
@@ -198,7 +201,7 @@ def sum_filter(l):
 
 @app.template_filter('lang_nice')
 def lang_nice_filter(s):
-  return {'rb': 'Ruby', 'js': 'JavaScript'}.get(s, s)
+  return extensions.get_language_from_extension(s)
 
 if __name__ == '__main__':
   if dev:

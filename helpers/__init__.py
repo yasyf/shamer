@@ -1,1 +1,1 @@
-__all__ = ['s3', 'constants', 'githubuser', 'githubbot', 'sources']
+__all__ = ['s3', 'constants', 'githubuser', 'githubbot', 'sources', 'extensions']
