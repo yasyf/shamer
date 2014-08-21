@@ -48,7 +48,7 @@ class GithubBot():
       if min(coverage_diffs.values()) < -10:
         commit = self.repo.get_commit(args.get('commit_id')) or pr.get_commits().reversed[0]
         user = storage.get(commit.author.login) or {'name': commit.author.name, 'login': commit.author.login}
-        if user.get('dangerously_low') != True:
+        if ci_restart_url and user.get('dangerously_low') != True:
           user['dangerously_low'] = True
           storage.set(pr.user.login, user)
           url = ci_restart_url.replace('$build_id$', build_id).replace('$api_key$', ci_api_key)
