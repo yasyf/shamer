@@ -26,7 +26,7 @@ collections = zip(constants.get('GH_REPOS').split(','), constants.get('STORAGE_C
 storages = {}
 for repo_name, collection_name in collections:
   try:
-    storage = Constants(MongoConstants(collection_name, constants.get('MONGO_URI')))
+    storage = Constants(MongoConstants(collection_name, constants.get('MONGOLAB_URI')))
   except:
     storage = None
   storages[repo_name] = storage
@@ -51,7 +51,7 @@ def preprocess_request():
       return redirect(session.pop('next'))
     if not s3:
       flash('Your S3 keys are invalid!', 'danger')
-      return redirect(url_for('demo_view'))
+      return 'Your S3 keys are invalid!'
 
 @app.after_request
 def postprocess_request(response):
