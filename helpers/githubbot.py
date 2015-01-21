@@ -5,12 +5,13 @@ import requests
 from collections import defaultdict
 
 class GithubBot():
-  def __init__(self, constants, repo_name, langs):
+  def __init__(self, constants, repo_name, langs, current):
     self.g = Github(constants.get('GH_BOT_TOKEN'))
     self.user = self.g.get_user()
     self.org = self.g.get_organization(constants.get('GH_ORG_NAME'))
     self.repo = self.org.get_repo(repo_name)
     self.languages = langs.split(',')
+    self.current = current.split(',')
     self.constants = constants
     self.cache = defaultdict(dict)
 
@@ -38,11 +39,11 @@ class GithubBot():
       pr = self.repo.get_pull(pull_request_id)
       base_commit_sha = pr.base.sha
       if not storage.get('master'):
-        default = zip(self.languages, self.constants.get('CURRENT').split(','))
+        default = dict(zip(self.languages, self.current))
         default.update({'repo_name': self.repo.name, 'build_id': '1'})
-        storage.set('master', default)
+        storage.set('master', {'current': default, 'base_commit_sha': default})
       if base_commit_sha not in storage.get('master'):
-        base_commit_sha = sorted(storage.get('master').items(), key=lambda x: x[1]['build_id'])[0][-1]
+        base_commit_sha = sorted(storage.get('master').items(), key=lambda x: x[1]['build_id'])[0][0]
       # Sometimes coverage reports do funky things. This should prevent recording most of them.
       coverage_diffs = self.do_for_each_language(lambda l: float(args.get(l, 0)) - float(storage.get('master').get(base_commit_sha).get(l)))
       if min(coverage_diffs.values()) < -10:

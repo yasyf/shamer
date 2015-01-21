@@ -16,6 +16,7 @@ app.secret_key = constants.get('SK')
 extensions = LanguageExtensions()
 
 LANGS = dict(zip(constants.get('GH_REPOS').split(','), constants.get('LANGS').split(';')))
+CURRENT = dict(zip(constants.get('GH_REPOS').split(','), constants.get('CURRENT').split(';')))
 
 try:
   s3 = S3(constants.get('AWS_ACCESS_KEY'), constants.get('AWS_SECRET_KEY'), constants.get('AWS_BUCKET'))
@@ -34,7 +35,7 @@ for repo_name, collection_name in collections:
 bots ={}
 for repo_name in constants.get('GH_REPOS').split(','):
   try:
-    bot = GithubBot(constants, repo_name, LANGS[repo_name])
+    bot = GithubBot(constants, repo_name, LANGS[repo_name], CURRENT[repo_name])
   except:
     bot = None
   bots[repo_name] = bot
