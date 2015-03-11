@@ -16,6 +16,7 @@ app.secret_key = constants.get('SK')
 extensions = LanguageExtensions()
 
 LANGS = dict(zip(constants.get('GH_REPOS').split(','), constants.get('LANGS').split(';')))
+CURRENT = dict(zip(constants.get('GH_REPOS').split(','), constants.get('CURRENT').split(';')))
 
 try:
   s3 = S3(constants.get('AWS_ACCESS_KEY'), constants.get('AWS_SECRET_KEY'), constants.get('AWS_BUCKET'))
@@ -26,7 +27,7 @@ collections = zip(constants.get('GH_REPOS').split(','), constants.get('STORAGE_C
 storages = {}
 for repo_name, collection_name in collections:
   try:
-    storage = Constants(MongoConstants(collection_name, constants.get('MONGO_URI')))
+    storage = Constants(MongoConstants(collection_name, constants.get('MONGOLAB_URI')))
   except:
     storage = None
   storages[repo_name] = storage
@@ -34,7 +35,7 @@ for repo_name, collection_name in collections:
 bots ={}
 for repo_name in constants.get('GH_REPOS').split(','):
   try:
-    bot = GithubBot(constants, repo_name, LANGS[repo_name])
+    bot = GithubBot(constants, repo_name, LANGS[repo_name], CURRENT[repo_name])
   except:
     bot = None
   bots[repo_name] = bot
@@ -51,7 +52,7 @@ def preprocess_request():
       return redirect(session.pop('next'))
     if not s3:
       flash('Your S3 keys are invalid!', 'danger')
-      return redirect(url_for('demo_view'))
+      return 'Your S3 keys are invalid!'
 
 @app.after_request
 def postprocess_request(response):
