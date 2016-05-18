@@ -3,9 +3,9 @@ from pymongo import MongoClient
 
 class MongoConstants():
   def __init__(self, collection_name, mongo_uri):
-    logging.info('Connecting to Mongo DB %s', mongo_uri)
-    self.client = MongoClient(mongo_uri)
     db = mongo_uri.split('/')[-1]
+    logging.info('Connecting to mongo: %s', db)
+    self.client = MongoClient(mongo_uri)
     self.collection = self.client[db][collection_name]
 
   def get(self, key):
