@@ -1,4 +1,4 @@
-#Shamer
+# Shamer
 
 Shamer is a simple micro-service with the goal of making it dead simple to gamify code coverage. Testing is a huge part of our culture at Localytics, and Shamer is the result of our efforts to encourage everyone to write the most thorough tests possible.
 
@@ -12,13 +12,13 @@ There is a single webhook which can take any arbitrary parameters and use them t
 
 The included deploy script depend on this code being deployed to [Heroku](https://www.heroku.com/). If you are deploying to AWS or any other cloud provider, you will probably need to alter the code.
 
-##Deploy Instructions
+## Deploy Instructions
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/localytics/shamer/)
 
 Click the above button to deploy a Shamer instance to Heroku.
 
-###Manual Deploy
+### Manual Deploy
 
 Install `pip` if you haven't already.
 
@@ -39,7 +39,7 @@ To reuse your config from the last deploy, edit `.env` as needed, then run the d
 $ foreman run ./deploy.py
 ```
 
-##Usage
+## Usage
 
 Once you have a Shamer instance up and running, it is very easy to integrate the leaderboard into your project. In setting up Shamer, you only have one responsibiliy: generate code coverage and pass the numbers to a webhook. How you do this will vary by project and language. At Localytics, we generate coverage after every CI build.
 
@@ -57,7 +57,7 @@ Here is an example request for a project that has both Ruby and JavaScript code,
 GET http://shamer.herokuapp.com/hook/123/xyz/coverage/index.html?repo_name=my_repo&build_id=1861574&commit_id=9a98f3bb8dbe23e60f1c1bfb2191a242910b2ea1&js=33.66&rb=57.68
 ```
 
-##Customization
+## Customization
 
 The jinja2 template at `templates/_comment.md` is how the service generates GitHub comments. We have included a sample that we use for adding code coverage notifiations to pull requests, but you can change this to suit your needs.
 
